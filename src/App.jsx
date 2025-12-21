@@ -47,56 +47,61 @@ const CollapsibleSection = ({ title, icon: Icon, children, defaultOpen = true })
 };
 
 export default function FuhrparkRechner() {
-  const [fahrzeug, setFahrzeug] = useState({
-    name: 'VW ID.3 Pure',
-    leasingNetto: 222,
-    laufzeitMonate: 48,
-    fahrleistung: 10000,
-    ueberfuehrung: 790,
-    bruttolistenpreis: 34000,
-    verbrauch: 16,
-  });
+  // Default values
+  const defaultValues = {
+    fahrzeug: {
+      name: 'VW ID.3 Pure',
+      leasingNetto: 222,
+      laufzeitMonate: 48,
+      fahrleistung: 10000,
+      ueberfuehrung: 790,
+      bruttolistenpreis: 34000,
+      verbrauch: 16,
+    },
+    infrastruktur: {
+      wallboxFirma: 1200,
+      wallboxZuhause: 1200,
+      abschreibungJahre: 5,
+      strompreis: 0.30,
+      ladekartenMonat: 40,
+      versicherungMonat: 80,
+    },
+    unternehmen: {
+      mitarbeiter: 20,
+      fuhrparkGehalt: 54000,
+      personalSchwelle: 100,
+      zusatzPersonalKosten: 40000,
+      grenzsteuersatz: 45,
+    },
+    verbrenner: {
+      leasingMonat: 350,
+      versicherungMonat: 100,
+      kfzSteuer: 150,
+      verbrauchL: 7,
+      spritpreis: 1.70,
+      wartung: 500,
+    },
+    anEinstellungen: {
+      steuersatzAN: 35,
+      svAnteilAG: 20,
+      svAnteilAN: 20,
+      privatStromAnteil: 30,
+      geldwerterVorteilProzent: 0.25,
+      arbeitstage: 220,
+      stundenProTag: 8,
+      samstage: 20,
+      samstagStunden: 5.5,
+      samstagZuschlag: 50,
+      ueberstundenMonat: 20,
+      ueberstundenZulage: 25,
+    }
+  };
 
-  const [infrastruktur, setInfrastruktur] = useState({
-    wallboxFirma: 1200,
-    wallboxZuhause: 1200,
-    abschreibungJahre: 5,
-    strompreis: 0.30,
-    ladekartenMonat: 40,
-    versicherungMonat: 80,
-  });
-
-  const [unternehmen, setUnternehmen] = useState({
-    mitarbeiter: 20,
-    fuhrparkGehalt: 54000,
-    personalSchwelle: 100,
-    zusatzPersonalKosten: 40000,
-    grenzsteuersatz: 45,
-  });
-
-  const [verbrenner, setVerbrenner] = useState({
-    leasingMonat: 350,
-    versicherungMonat: 100,
-    kfzSteuer: 150,
-    verbrauchL: 7,
-    spritpreis: 1.70,
-    wartung: 500,
-  });
-
-  const [anEinstellungen, setAnEinstellungen] = useState({
-    steuersatzAN: 35,
-    svAnteilAG: 20,
-    svAnteilAN: 20,
-    privatStromAnteil: 30,
-    geldwerterVorteilProzent: 0.25,
-    arbeitstage: 220,
-    stundenProTag: 8,
-    samstage: 20,
-    samstagStunden: 5.5,
-    samstagZuschlag: 50,
-    ueberstundenMonat: 20,
-    ueberstundenZulage: 25,
-  });
+  const [fahrzeug, setFahrzeug] = useState(defaultValues.fahrzeug);
+  const [infrastruktur, setInfrastruktur] = useState(defaultValues.infrastruktur);
+  const [unternehmen, setUnternehmen] = useState(defaultValues.unternehmen);
+  const [verbrenner, setVerbrenner] = useState(defaultValues.verbrenner);
+  const [anEinstellungen, setAnEinstellungen] = useState(defaultValues.anEinstellungen);
 
   const [savedConfigs, setSavedConfigs] = useState([]);
   const [configName, setConfigName] = useState('');
@@ -209,6 +214,18 @@ export default function FuhrparkRechner() {
     };
     reader.readAsText(file);
     event.target.value = ''; // Reset input
+  };
+
+  // Reset to default values
+  const resetToDefaults = () => {
+    if (confirm('Alle Einstellungen auf die Standardwerte zurücksetzen?')) {
+      setFahrzeug(defaultValues.fahrzeug);
+      setInfrastruktur(defaultValues.infrastruktur);
+      setUnternehmen(defaultValues.unternehmen);
+      setVerbrenner(defaultValues.verbrenner);
+      setAnEinstellungen(defaultValues.anEinstellungen);
+      alert('Standardwerte wurden wiederhergestellt.');
+    }
   };
 
   const berechnungen = useMemo(() => {
@@ -404,25 +421,34 @@ export default function FuhrparkRechner() {
                 </div>
               )}
 
-              {/* Export/Import */}
-              <div className="border-t pt-3 flex gap-2">
+              {/* Export/Import/Reset */}
+              <div className="border-t pt-3 space-y-2">
+                <div className="flex gap-2">
+                  <button
+                    onClick={exportConfiguration}
+                    className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center justify-center gap-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    Exportieren
+                  </button>
+                  <label className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center justify-center gap-2 cursor-pointer">
+                    <Upload className="w-4 h-4" />
+                    Importieren
+                    <input
+                      type="file"
+                      accept=".json"
+                      onChange={importConfiguration}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
                 <button
-                  onClick={exportConfiguration}
-                  className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center justify-center gap-2"
+                  onClick={resetToDefaults}
+                  className="w-full px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center justify-center gap-2"
                 >
-                  <Download className="w-4 h-4" />
-                  Exportieren (JSON)
+                  <Calculator className="w-4 h-4" />
+                  Standard laden
                 </button>
-                <label className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center justify-center gap-2 cursor-pointer">
-                  <Upload className="w-4 h-4" />
-                  Importieren (JSON)
-                  <input
-                    type="file"
-                    accept=".json"
-                    onChange={importConfiguration}
-                    className="hidden"
-                  />
-                </label>
               </div>
 
               <div className="text-xs text-gray-500 bg-blue-50 p-2 rounded">
