@@ -209,7 +209,7 @@ export default function FuhrparkRechner() {
             <Car className="w-8 h-8" />
             <h1 className="text-2xl font-bold">E-Firmenwagen Rechner</h1>
           </div>
-          <p className="text-blue-100 text-sm">Interaktive Kostenanalyse</p>
+          <p className="text-blue-100 text-sm">Vergleich: Firmenwagen vs. Lohnerhöhung - Was lohnt sich mehr?</p>
         </div>
       </header>
 
@@ -236,7 +236,7 @@ export default function FuhrparkRechner() {
               <p className="text-xl font-bold text-blue-700">{berechnungen.aktuell.gesamtkosten.toLocaleString('de-DE')} €</p>
             </div>
             <div className="bg-green-50 rounded-lg p-3 border border-green-200">
-              <p className="text-xs text-gray-600">Effektive Belastung (alle MA)</p>
+              <p className="text-xs text-gray-600">Tatsächliche Belastung nach Steuern (alle MA)</p>
               <p className="text-xl font-bold text-green-700">{berechnungen.aktuell.gesamtkostenEffektiv.toLocaleString('de-DE')} €</p>
             </div>
             <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
@@ -244,7 +244,7 @@ export default function FuhrparkRechner() {
               <p className="text-xl font-bold text-blue-700">{berechnungen.aktuell.stundenlohn.toFixed(2)} €</p>
             </div>
             <div className="bg-green-50 rounded-lg p-3 border border-green-200">
-              <p className="text-xs text-gray-600">Pro Stunde je MA (effektiv)</p>
+              <p className="text-xs text-gray-600">Pro Stunde je MA (nach Steuern)</p>
               <p className="text-xl font-bold text-green-700">{berechnungen.aktuell.stundenlohnEffektiv.toFixed(2)} €</p>
             </div>
           </div>
@@ -287,7 +287,7 @@ export default function FuhrparkRechner() {
             <InputField label="Laufzeit" value={fahrzeug.laufzeitMonate} onChange={(v) => setFahrzeug({...fahrzeug, laufzeitMonate: v})} suffix="Mon" tooltip="Laufzeit des Leasingvertrags in Monaten" />
             <InputField label="km/Jahr" value={fahrzeug.fahrleistung} onChange={(v) => setFahrzeug({...fahrzeug, fahrleistung: v})} suffix="km" step={1000} tooltip="Jährliche Fahrleistung pro Fahrzeug" />
             <InputField label="Überführung" value={fahrzeug.ueberfuehrung} onChange={(v) => setFahrzeug({...fahrzeug, ueberfuehrung: v})} suffix="€" tooltip="Einmalige Überführungskosten pro Fahrzeug" />
-            <InputField label="Listenpreis" value={fahrzeug.bruttolistenpreis} onChange={(v) => setFahrzeug({...fahrzeug, bruttolistenpreis: v})} suffix="€" tooltip="Bruttolistenpreis für die 0,25%-Regel (geldwerter Vorteil)" />
+            <InputField label="Listenpreis (UVP)" value={fahrzeug.bruttolistenpreis} onChange={(v) => setFahrzeug({...fahrzeug, bruttolistenpreis: v})} suffix="€" tooltip="Unverbindliche Preisempfehlung des Herstellers - wichtig für die Berechnung des geldwerten Vorteils (0,25%-Regel bei E-Autos)" />
             <InputField label="Verbrauch" value={fahrzeug.verbrauch} onChange={(v) => setFahrzeug({...fahrzeug, verbrauch: v})} suffix="kWh/100km" tooltip="Durchschnittlicher Stromverbrauch pro 100 km" />
           </div>
         </CollapsibleSection>
@@ -295,7 +295,7 @@ export default function FuhrparkRechner() {
         <CollapsibleSection title="Unternehmen" icon={Building2}>
           <div className="grid grid-cols-2 gap-3">
             <InputField label="Mitarbeiter" value={unternehmen.mitarbeiter} onChange={(v) => setUnternehmen({...unternehmen, mitarbeiter: v})} suffix="MA" min={1} tooltip="Anzahl der Mitarbeiter mit Firmenwagen" />
-            <InputField label="Grenzsteuersatz AG" value={unternehmen.grenzsteuersatz} onChange={(v) => setUnternehmen({...unternehmen, grenzsteuersatz: v})} suffix="%" tooltip="Grenzsteuersatz des Unternehmens (GmbH & Co. KG NRW: ~45%)" />
+            <InputField label="Steuersatz Unternehmen" value={unternehmen.grenzsteuersatz} onChange={(v) => setUnternehmen({...unternehmen, grenzsteuersatz: v})} suffix="%" tooltip="Steuersatz des Unternehmens auf Gewinne (GmbH & Co. KG in NRW: ca. 45% - Einkommensteuer + Gewerbesteuer)" />
             <InputField label="Fuhrpark-Gehalt" value={unternehmen.fuhrparkGehalt} onChange={(v) => setUnternehmen({...unternehmen, fuhrparkGehalt: v})} suffix="€/Jahr" tooltip="Jahresgehalt Fuhrparkmanager inkl. AG-Anteile" />
             <InputField label="Personal-Schwelle" value={unternehmen.personalSchwelle} onChange={(v) => setUnternehmen({...unternehmen, personalSchwelle: v})} suffix="MA" tooltip="Ab dieser Anzahl an Firmenfahrzeugen wird zusätzliches Personal für die Fuhrparkverwaltung benötigt" />
             <InputField label="Zusatzpersonal-Kosten" value={unternehmen.zusatzPersonalKosten} onChange={(v) => setUnternehmen({...unternehmen, zusatzPersonalKosten: v})} suffix="€/Jahr" tooltip="Jahreskosten pro zusätzlicher Teilzeitkraft für die Fuhrparkverwaltung" />
@@ -324,7 +324,7 @@ export default function FuhrparkRechner() {
           </div>
         </CollapsibleSection>
 
-        <CollapsibleSection title="AN-Berechnungsgrundlagen" icon={User} defaultOpen={false}>
+        <CollapsibleSection title="Arbeitnehmer-Berechnungsgrundlagen" icon={User} defaultOpen={false}>
           <div className="grid grid-cols-2 gap-3">
             <InputField label="Arbeitstage/Jahr" value={anEinstellungen.arbeitstage} onChange={(v) => setAnEinstellungen({...anEinstellungen, arbeitstage: v})} suffix="Tage" tooltip="Anzahl der normalen Arbeitstage pro Jahr (Montag-Freitag)" />
             <InputField label="Stunden/Tag" value={anEinstellungen.stundenProTag} onChange={(v) => setAnEinstellungen({...anEinstellungen, stundenProTag: v})} suffix="h" tooltip="Arbeitsstunden pro normalem Arbeitstag" />
@@ -332,7 +332,7 @@ export default function FuhrparkRechner() {
             <InputField label="Stunden/Samstag" value={anEinstellungen.samstagStunden} onChange={(v) => setAnEinstellungen({...anEinstellungen, samstagStunden: v})} suffix="h" step={0.5} tooltip="Arbeitsstunden pro Samstag (Standard: 5,5h)" />
             <InputField label="Samstags-Zuschlag" value={anEinstellungen.samstagZuschlag} onChange={(v) => setAnEinstellungen({...anEinstellungen, samstagZuschlag: v})} suffix="%" tooltip="Prozentualer Zuschlag für Samstagsarbeit (üblich: 50%)" />
             <InputField label="Überstunden-Zulage" value={anEinstellungen.ueberstundenZulage} onChange={(v) => setAnEinstellungen({...anEinstellungen, ueberstundenZulage: v})} suffix="%" tooltip="Prozentuale Zulage auf alle Arbeitsstunden (Standard: 25%)" />
-            <InputField label="Grenzsteuersatz AN" value={anEinstellungen.steuersatzAN} onChange={(v) => setAnEinstellungen({...anEinstellungen, steuersatzAN: v})} suffix="%" tooltip="Grenzsteuersatz des Arbeitnehmers (Lohnsteuer + Solidaritätszuschlag)" />
+            <InputField label="Steuersatz Mitarbeiter" value={anEinstellungen.steuersatzAN} onChange={(v) => setAnEinstellungen({...anEinstellungen, steuersatzAN: v})} suffix="%" tooltip="Persönlicher Steuersatz des Mitarbeiters (Lohnsteuer + Solidaritätszuschlag, typisch: 30-42%)" />
             <InputField label="Geldw. Vorteil Regel" value={anEinstellungen.geldwerterVorteilProzent} onChange={(v) => setAnEinstellungen({...anEinstellungen, geldwerterVorteilProzent: v})} suffix="%" step={0.25} tooltip="Monatlicher Prozentsatz vom Listenpreis für geldwerten Vorteil: E-Auto 0,25% | Hybrid 0,5% | Verbrenner 1%" />
             <InputField label="SV-Anteil Arbeitgeber" value={anEinstellungen.svAnteilAG} onChange={(v) => setAnEinstellungen({...anEinstellungen, svAnteilAG: v})} suffix="%" tooltip="Arbeitgeber-Anteil Sozialversicherung (Renten-, Kranken-, Pflege-, Arbeitslosenversicherung)" />
             <InputField label="SV-Anteil Arbeitnehmer" value={anEinstellungen.svAnteilAN} onChange={(v) => setAnEinstellungen({...anEinstellungen, svAnteilAN: v})} suffix="%" tooltip="Arbeitnehmer-Anteil Sozialversicherung (Renten-, Kranken-, Pflege-, Arbeitslosenversicherung)" />
@@ -394,51 +394,66 @@ export default function FuhrparkRechner() {
               <div className="flex flex-col items-center">
                 <div className="text-xs text-gray-600 mb-1 font-bold">AG zahlt {berechnungen.balkenData.agAusgabe.toLocaleString('de-DE')} €</div>
                 <div className="flex flex-col-reverse w-32 border-2 border-gray-300 rounded-t-lg overflow-hidden" style={{ height: '240px' }}>
-                  <div className="bg-green-500 flex items-center justify-center text-white text-xs font-bold" style={{ height: `${(berechnungen.balkenData.lohn.netto / berechnungen.balkenData.agAusgabe) * 100}%` }}>
+                  <div className="bg-green-500 flex items-center justify-center text-white text-xs font-bold relative group cursor-help" style={{ height: `${(berechnungen.balkenData.lohn.netto / berechnungen.balkenData.agAusgabe) * 100}%` }}>
                     <div className="text-center p-1">
                       <div>Netto</div>
                       <div>{berechnungen.balkenData.lohn.netto.toLocaleString('de-DE')} €</div>
                     </div>
+                    <div className="absolute left-full ml-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10">
+                      Das Nettogeld, das tatsächlich auf dem Konto des Mitarbeiters landet
+                    </div>
                   </div>
-                  <div className="bg-orange-500 flex items-center justify-center text-white text-xs font-bold" style={{ height: `${(berechnungen.balkenData.lohn.anSV / berechnungen.balkenData.agAusgabe) * 100}%` }}>
+                  <div className="bg-orange-500 flex items-center justify-center text-white text-xs font-bold relative group cursor-help" style={{ height: `${(berechnungen.balkenData.lohn.anSV / berechnungen.balkenData.agAusgabe) * 100}%` }}>
                     <div className="text-center p-1">
                       <div>AN-SV</div>
                       <div>{berechnungen.balkenData.lohn.anSV.toLocaleString('de-DE')} €</div>
                     </div>
+                    <div className="absolute left-full ml-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10">
+                      Arbeitnehmer-Anteil zur Sozialversicherung (Rente, Kranken-, Pflege-, Arbeitslosenversicherung)
+                    </div>
                   </div>
-                  <div className="bg-red-500 flex items-center justify-center text-white text-xs font-bold" style={{ height: `${(berechnungen.balkenData.lohn.steuer / berechnungen.balkenData.agAusgabe) * 100}%` }}>
+                  <div className="bg-red-500 flex items-center justify-center text-white text-xs font-bold relative group cursor-help" style={{ height: `${(berechnungen.balkenData.lohn.steuer / berechnungen.balkenData.agAusgabe) * 100}%` }}>
                     <div className="text-center p-1">
                       <div>Steuer</div>
                       <div>{berechnungen.balkenData.lohn.steuer.toLocaleString('de-DE')} €</div>
                     </div>
+                    <div className="absolute left-full ml-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10">
+                      Lohnsteuer und Solidaritätszuschlag, die direkt ans Finanzamt gehen
+                    </div>
                   </div>
-                  <div className="bg-red-300 flex items-center justify-center text-white text-xs font-bold" style={{ height: `${(berechnungen.balkenData.lohn.agSV / berechnungen.balkenData.agAusgabe) * 100}%` }}>
+                  <div className="bg-red-300 flex items-center justify-center text-white text-xs font-bold relative group cursor-help" style={{ height: `${(berechnungen.balkenData.lohn.agSV / berechnungen.balkenData.agAusgabe) * 100}%` }}>
                     <div className="text-center p-1">
                       <div>AG-SV</div>
                       <div>{berechnungen.balkenData.lohn.agSV.toLocaleString('de-DE')} €</div>
+                    </div>
+                    <div className="absolute left-full ml-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10">
+                      Arbeitgeber-Anteil zur Sozialversicherung (zusätzlich zu den AG-Ausgaben)
                     </div>
                   </div>
                 </div>
                 <div className="text-sm font-bold mt-2 text-center">Lohnerhöhung</div>
                 <div className="text-xs text-red-600 font-bold">Nur {Math.round(berechnungen.balkenData.lohn.netto / berechnungen.balkenData.agAusgabe * 100)}% kommen an!</div>
               </div>
-              
+
               {/* Pfeil */}
               <div className="flex flex-col items-center justify-center text-4xl text-gray-400 pb-16">→</div>
-              
+
               {/* Firmenwagen Balken */}
               <div className="flex flex-col items-center">
                 <div className="text-xs text-gray-600 mb-1 font-bold">AG zahlt {berechnungen.balkenData.agAusgabe.toLocaleString('de-DE')} €</div>
                 <div className="flex flex-col-reverse w-32 border-2 border-green-500 rounded-t-lg overflow-hidden" style={{ height: '240px' }}>
-                  <div className="bg-green-500 flex items-center justify-center text-white text-xs font-bold" style={{ height: `${(berechnungen.balkenData.fw.wert / berechnungen.balkenData.agAusgabe) * 100}%` }}>
+                  <div className="bg-green-500 flex items-center justify-center text-white text-xs font-bold relative group cursor-help" style={{ height: `${(berechnungen.balkenData.fw.wert / berechnungen.balkenData.agAusgabe) * 100}%` }}>
                     <div className="text-center p-1">
                       <div>Auto-Nutzen</div>
                       <div>{berechnungen.balkenData.fw.wert.toLocaleString('de-DE')} €</div>
                     </div>
+                    <div className="absolute right-full mr-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10">
+                      Wert der Leasingrate - das Auto kann privat genutzt werden
+                    </div>
                   </div>
-                  <div 
-                    className="flex items-center justify-center text-white text-xs font-bold" 
-                    style={{ 
+                  <div
+                    className="flex items-center justify-center text-white text-xs font-bold relative group cursor-help"
+                    style={{
                       height: `${(berechnungen.balkenData.fw.extras / berechnungen.balkenData.agAusgabe) * 100}%`,
                       background: 'repeating-linear-gradient(45deg, #22c55e, #22c55e 5px, #60a5fa 5px, #60a5fa 10px)'
                     }}
@@ -447,11 +462,17 @@ export default function FuhrparkRechner() {
                       <div>Extras</div>
                       <div>{berechnungen.balkenData.fw.extras.toLocaleString('de-DE')} €</div>
                     </div>
+                    <div className="absolute right-full mr-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10">
+                      Versicherung, Strom, Wartung - alles vom Arbeitgeber bezahlt, Mitarbeiter profitiert
+                    </div>
                   </div>
-                  <div className="bg-yellow-400 flex items-center justify-center text-gray-800 text-xs font-bold" style={{ height: `${(berechnungen.balkenData.fw.steuer / berechnungen.balkenData.agAusgabe) * 100}%`, minHeight: '28px' }}>
+                  <div className="bg-yellow-400 flex items-center justify-center text-gray-800 text-xs font-bold relative group cursor-help" style={{ height: `${(berechnungen.balkenData.fw.steuer / berechnungen.balkenData.agAusgabe) * 100}%`, minHeight: '28px' }}>
                     <div className="text-center p-1">
                       <div>Steuer</div>
                       <div>{berechnungen.balkenData.fw.steuer.toLocaleString('de-DE')} €</div>
+                    </div>
+                    <div className="absolute right-full mr-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10">
+                      Steuer auf den geldwerten Vorteil (0,25% vom Listenpreis bei E-Autos)
                     </div>
                   </div>
                 </div>
