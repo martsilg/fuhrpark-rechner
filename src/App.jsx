@@ -232,19 +232,19 @@ export default function FuhrparkRechner() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-              <p className="text-xs text-gray-600">Gesamtkosten/Jahr</p>
+              <p className="text-xs text-gray-600">Gesamtkosten/Jahr (alle MA)</p>
               <p className="text-xl font-bold text-blue-700">{berechnungen.aktuell.gesamtkosten.toLocaleString('de-DE')} €</p>
             </div>
             <div className="bg-green-50 rounded-lg p-3 border border-green-200">
-              <p className="text-xs text-gray-600">Effektive Belastung</p>
+              <p className="text-xs text-gray-600">Effektive Belastung (alle MA)</p>
               <p className="text-xl font-bold text-green-700">{berechnungen.aktuell.gesamtkostenEffektiv.toLocaleString('de-DE')} €</p>
             </div>
             <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-              <p className="text-xs text-gray-600">Pro Stunde (brutto)</p>
+              <p className="text-xs text-gray-600">Pro Stunde je MA (brutto)</p>
               <p className="text-xl font-bold text-blue-700">{berechnungen.aktuell.stundenlohn.toFixed(2)} €</p>
             </div>
             <div className="bg-green-50 rounded-lg p-3 border border-green-200">
-              <p className="text-xs text-gray-600">Pro Stunde (effektiv)</p>
+              <p className="text-xs text-gray-600">Pro Stunde je MA (effektiv)</p>
               <p className="text-xl font-bold text-green-700">{berechnungen.aktuell.stundenlohnEffektiv.toFixed(2)} €</p>
             </div>
           </div>
