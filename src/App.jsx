@@ -389,17 +389,17 @@ export default function FuhrparkRechner() {
           {/* Balkendiagramm */}
           <div className="bg-white rounded-lg p-4 mb-4">
             <h3 className="text-base font-semibold text-gray-700 mb-2">Was kommt beim AN an? (bei gleichen AG-Ausgaben pro MA: {berechnungen.balkenData.agAusgabe.toLocaleString('de-DE')} €/Jahr)</h3>
-            <div className="flex gap-4 items-end justify-center h-80">
+            <div className="flex gap-4 items-end justify-center h-80" style={{ overflow: 'visible' }}>
               {/* Lohnerhöhung Balken */}
               <div className="flex flex-col items-center">
                 <div className="text-xs text-gray-600 mb-1 font-bold">AG zahlt {berechnungen.balkenData.agAusgabe.toLocaleString('de-DE')} €</div>
-                <div className="flex flex-col-reverse w-32 border-2 border-gray-300 rounded-t-lg overflow-hidden" style={{ height: '240px' }}>
+                <div className="flex flex-col-reverse w-32 border-2 border-gray-300 rounded-t-lg" style={{ height: '240px', overflow: 'visible' }}>
                   <div className="bg-green-500 flex items-center justify-center text-white text-xs font-bold relative group cursor-help" style={{ height: `${(berechnungen.balkenData.lohn.netto / berechnungen.balkenData.agAusgabe) * 100}%` }}>
                     <div className="text-center p-1">
                       <div>Netto</div>
                       <div>{berechnungen.balkenData.lohn.netto.toLocaleString('de-DE')} €</div>
                     </div>
-                    <div className="absolute left-full ml-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10">
+                    <div className="absolute left-full ml-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg" style={{ zIndex: 50 }}>
                       Das Nettogeld, das tatsächlich auf dem Konto des Mitarbeiters landet
                     </div>
                   </div>
@@ -408,7 +408,7 @@ export default function FuhrparkRechner() {
                       <div>AN-SV</div>
                       <div>{berechnungen.balkenData.lohn.anSV.toLocaleString('de-DE')} €</div>
                     </div>
-                    <div className="absolute left-full ml-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10">
+                    <div className="absolute left-full ml-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg" style={{ zIndex: 50 }}>
                       Arbeitnehmer-Anteil zur Sozialversicherung (Rente, Kranken-, Pflege-, Arbeitslosenversicherung)
                     </div>
                   </div>
@@ -417,7 +417,7 @@ export default function FuhrparkRechner() {
                       <div>Steuer</div>
                       <div>{berechnungen.balkenData.lohn.steuer.toLocaleString('de-DE')} €</div>
                     </div>
-                    <div className="absolute left-full ml-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10">
+                    <div className="absolute left-full ml-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg" style={{ zIndex: 50 }}>
                       Lohnsteuer und Solidaritätszuschlag, die direkt ans Finanzamt gehen
                     </div>
                   </div>
@@ -426,7 +426,7 @@ export default function FuhrparkRechner() {
                       <div>AG-SV</div>
                       <div>{berechnungen.balkenData.lohn.agSV.toLocaleString('de-DE')} €</div>
                     </div>
-                    <div className="absolute left-full ml-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10">
+                    <div className="absolute left-full ml-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg" style={{ zIndex: 50 }}>
                       Arbeitgeber-Anteil zur Sozialversicherung (zusätzlich zu den AG-Ausgaben)
                     </div>
                   </div>
@@ -441,13 +441,13 @@ export default function FuhrparkRechner() {
               {/* Firmenwagen Balken */}
               <div className="flex flex-col items-center">
                 <div className="text-xs text-gray-600 mb-1 font-bold">AG zahlt {berechnungen.balkenData.agAusgabe.toLocaleString('de-DE')} €</div>
-                <div className="flex flex-col-reverse w-32 border-2 border-green-500 rounded-t-lg overflow-hidden" style={{ height: '240px' }}>
+                <div className="flex flex-col-reverse w-32 border-2 border-green-500 rounded-t-lg" style={{ height: '240px', overflow: 'visible' }}>
                   <div className="bg-green-500 flex items-center justify-center text-white text-xs font-bold relative group cursor-help" style={{ height: `${(berechnungen.balkenData.fw.wert / berechnungen.balkenData.agAusgabe) * 100}%` }}>
                     <div className="text-center p-1">
                       <div>Auto-Nutzen</div>
                       <div>{berechnungen.balkenData.fw.wert.toLocaleString('de-DE')} €</div>
                     </div>
-                    <div className="absolute right-full mr-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10">
+                    <div className="absolute right-full mr-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg" style={{ zIndex: 50 }}>
                       Wert der Leasingrate - das Auto kann privat genutzt werden
                     </div>
                   </div>
@@ -462,7 +462,7 @@ export default function FuhrparkRechner() {
                       <div>Extras</div>
                       <div>{berechnungen.balkenData.fw.extras.toLocaleString('de-DE')} €</div>
                     </div>
-                    <div className="absolute right-full mr-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10">
+                    <div className="absolute right-full mr-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg" style={{ zIndex: 50 }}>
                       Versicherung, Strom, Wartung - alles vom Arbeitgeber bezahlt, Mitarbeiter profitiert
                     </div>
                   </div>
@@ -471,7 +471,7 @@ export default function FuhrparkRechner() {
                       <div>Steuer</div>
                       <div>{berechnungen.balkenData.fw.steuer.toLocaleString('de-DE')} €</div>
                     </div>
-                    <div className="absolute right-full mr-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10">
+                    <div className="absolute right-full mr-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg" style={{ zIndex: 50 }}>
                       Steuer auf den geldwerten Vorteil (0,25% vom Listenpreis bei E-Autos)
                     </div>
                   </div>
