@@ -246,14 +246,31 @@ export default function FuhrparkRechner() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Fahrzeugname</label>
               <input type="text" value={fahrzeug.name} onChange={(e) => setFahrzeug({...fahrzeug, name: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-base" />
             </div>
-            <InputField label="Leasing (netto)" value={fahrzeug.leasingNetto} onChange={(v) => setFahrzeug({...fahrzeug, leasingNetto: v})} suffix="€/Mon" />
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700">Leasing (netto)</label>
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1">
+                  <input
+                    type="number"
+                    value={fahrzeug.leasingNetto}
+                    onChange={(e) => setFahrzeug({...fahrzeug, leasingNetto: parseFloat(e.target.value) || 0})}
+                    min={0}
+                    step={1}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-16 text-base"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">€/Mon</span>
+                </div>
+                <div className="text-sm text-blue-700 bg-blue-50 px-3 py-2 rounded-lg border border-blue-200 whitespace-nowrap">
+                  Brutto: {berechnungen.leasingBrutto} €
+                </div>
+              </div>
+            </div>
             <InputField label="Laufzeit" value={fahrzeug.laufzeitMonate} onChange={(v) => setFahrzeug({...fahrzeug, laufzeitMonate: v})} suffix="Mon" />
             <InputField label="km/Jahr" value={fahrzeug.fahrleistung} onChange={(v) => setFahrzeug({...fahrzeug, fahrleistung: v})} suffix="km" step={1000} />
             <InputField label="Überführung" value={fahrzeug.ueberfuehrung} onChange={(v) => setFahrzeug({...fahrzeug, ueberfuehrung: v})} suffix="€" />
             <InputField label="Listenpreis" value={fahrzeug.bruttolistenpreis} onChange={(v) => setFahrzeug({...fahrzeug, bruttolistenpreis: v})} suffix="€" tooltip="Für 0,25%-Regel" />
             <InputField label="Verbrauch" value={fahrzeug.verbrauch} onChange={(v) => setFahrzeug({...fahrzeug, verbrauch: v})} suffix="kWh/100km" />
           </div>
-          <p className="mt-3 text-sm text-blue-700 bg-blue-50 p-2 rounded">Brutto: {berechnungen.leasingBrutto} €/Monat</p>
         </CollapsibleSection>
 
         <CollapsibleSection title="Unternehmen" icon={Building2}>
