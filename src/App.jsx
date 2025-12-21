@@ -82,17 +82,20 @@ export default function FuhrparkRechner() {
     arbeitstage: 220,
     stundenProTag: 8,
     samstage: 0,
+    samstagStunden: 5.5,
     samstagZuschlag: 50,
+    ueberstundenZulage: 25,
   });
 
   const berechnungen = useMemo(() => {
     const steuersatz = unternehmen.grenzsteuersatz / 100;
     const leasingBrutto = fahrzeug.leasingNetto * 1.19;
     
-    // Arbeitsstunden berechnen (mit Samstags-Zuschlag)
+    // Arbeitsstunden berechnen (mit Samstags-Zuschlag und Überstunden-Zulage)
     const normaleStunden = anEinstellungen.arbeitstage * anEinstellungen.stundenProTag;
-    const samstagsStundenEffektiv = anEinstellungen.samstage * anEinstellungen.stundenProTag * (1 + anEinstellungen.samstagZuschlag / 100);
-    const arbeitsstundenJahr = normaleStunden + samstagsStundenEffektiv;
+    const samstagsStundenEffektiv = anEinstellungen.samstage * anEinstellungen.samstagStunden * (1 + anEinstellungen.samstagZuschlag / 100);
+    const ueberstundenEffektiv = (normaleStunden + (anEinstellungen.samstage * anEinstellungen.samstagStunden)) * (anEinstellungen.ueberstundenZulage / 100);
+    const arbeitsstundenJahr = normaleStunden + samstagsStundenEffektiv + ueberstundenEffektiv;
     
     const leasingJahr = leasingBrutto * 12;
     const ueberfuehrungJahr = fahrzeug.ueberfuehrung / (fahrzeug.laufzeitMonate / 12);
@@ -290,7 +293,9 @@ export default function FuhrparkRechner() {
             <InputField label="Arbeitstage/Jahr" value={anEinstellungen.arbeitstage} onChange={(v) => setAnEinstellungen({...anEinstellungen, arbeitstage: v})} suffix="Tage" tooltip="Normale Arbeitstage (Mo-Fr)" />
             <InputField label="Stunden/Tag" value={anEinstellungen.stundenProTag} onChange={(v) => setAnEinstellungen({...anEinstellungen, stundenProTag: v})} suffix="h" />
             <InputField label="Samstage/Jahr" value={anEinstellungen.samstage} onChange={(v) => setAnEinstellungen({...anEinstellungen, samstage: v})} suffix="Tage" tooltip="Zusätzliche Samstagsarbeit" />
+            <InputField label="Stunden/Samstag" value={anEinstellungen.samstagStunden} onChange={(v) => setAnEinstellungen({...anEinstellungen, samstagStunden: v})} suffix="h" step={0.5} tooltip="Standard: 5,5h" />
             <InputField label="Samstags-Zuschlag" value={anEinstellungen.samstagZuschlag} onChange={(v) => setAnEinstellungen({...anEinstellungen, samstagZuschlag: v})} suffix="%" tooltip="Üblicher Zuschlag: 50%" />
+            <InputField label="Überstunden-Zulage" value={anEinstellungen.ueberstundenZulage} onChange={(v) => setAnEinstellungen({...anEinstellungen, ueberstundenZulage: v})} suffix="%" tooltip="Standard: 25%" />
             <InputField label="Grenzsteuersatz AN" value={anEinstellungen.steuersatzAN} onChange={(v) => setAnEinstellungen({...anEinstellungen, steuersatzAN: v})} suffix="%" tooltip="Lohnsteuer + Soli" />
             <InputField label="Geldw. Vorteil Regel" value={anEinstellungen.geldwerterVorteilProzent} onChange={(v) => setAnEinstellungen({...anEinstellungen, geldwerterVorteilProzent: v})} suffix="%" step={0.25} tooltip="E-Auto: 0,25% | Hybrid: 0,5% | Verbrenner: 1%" />
             <InputField label="SV-Anteil Arbeitgeber" value={anEinstellungen.svAnteilAG} onChange={(v) => setAnEinstellungen({...anEinstellungen, svAnteilAG: v})} suffix="%" tooltip="RV, KV, PV, AV" />
@@ -298,7 +303,17 @@ export default function FuhrparkRechner() {
             <InputField label="Privater Stromanteil" value={anEinstellungen.privatStromAnteil} onChange={(v) => setAnEinstellungen({...anEinstellungen, privatStromAnteil: v})} suffix="%" tooltip="Anteil private Fahrten zu Hause laden" />
           </div>
           <div className="mt-3 p-3 bg-blue-50 rounded-lg text-sm space-y-1">
-            <p><strong>Arbeitsstunden/Jahr:</strong> {berechnungen.arbeitsstundenJahr.toLocaleString('de-DE')} h ({anEinstellungen.arbeitstage} Tage × {anEinstellungen.stundenProTag}h{anEinstellungen.samstage > 0 ? ` + ${anEinstellungen.samstage} Samstage × ${anEinstellungen.stundenProTag}h × ${100 + anEinstellungen.samstagZuschlag}%` : ''})</p>
+            <p><strong>Arbeitsstunden/Jahr:</strong> {berechnungen.arbeitsstundenJahr.toLocaleString('de-DE')} h
+              <span className="text-xs text-gray-600 block ml-4">
+                • Normale Arbeit: {anEinstellungen.arbeitstage} Tage × {anEinstellungen.stundenProTag}h = {(anEinstellungen.arbeitstage * anEinstellungen.stundenProTag).toLocaleString('de-DE')} h
+                {anEinstellungen.samstage > 0 && (
+                  <>
+                    <br />• Samstage: {anEinstellungen.samstage} Tage × {anEinstellungen.samstagStunden}h × {100 + anEinstellungen.samstagZuschlag}% = {Math.round(anEinstellungen.samstage * anEinstellungen.samstagStunden * (1 + anEinstellungen.samstagZuschlag / 100)).toLocaleString('de-DE')} h
+                  </>
+                )}
+                <br />• Überstunden-Zulage: {anEinstellungen.ueberstundenZulage}% auf {((anEinstellungen.arbeitstage * anEinstellungen.stundenProTag) + (anEinstellungen.samstage * anEinstellungen.samstagStunden)).toLocaleString('de-DE')} h = {Math.round(((anEinstellungen.arbeitstage * anEinstellungen.stundenProTag) + (anEinstellungen.samstage * anEinstellungen.samstagStunden)) * (anEinstellungen.ueberstundenZulage / 100)).toLocaleString('de-DE')} h
+              </span>
+            </p>
             <p><strong>Geldwerter Vorteil:</strong> {berechnungen.geldwerterVorteil.toLocaleString('de-DE')} €/Jahr ({fahrzeug.bruttolistenpreis.toLocaleString('de-DE')} € × {anEinstellungen.geldwerterVorteilProzent}% × 12)</p>
             <p><strong>Steuer auf geldw. Vorteil:</strong> {berechnungen.steuerAN.toLocaleString('de-DE')} €/Jahr ({berechnungen.geldwerterVorteil.toLocaleString('de-DE')} € × {anEinstellungen.steuersatzAN}%)</p>
           </div>
@@ -453,8 +468,12 @@ export default function FuhrparkRechner() {
               <h4 className="font-bold text-gray-800 mb-2">Stundenlohn-Äquivalent</h4>
               <div className="bg-gray-50 p-3 rounded-lg space-y-1">
                 <p><strong>Formel:</strong> (Gesamtkosten ÷ Mitarbeiter) ÷ Arbeitsstunden pro Jahr</p>
-                <p><strong>Arbeitsstunden:</strong> (Arbeitstage × Stunden/Tag) + (Samstage × Stunden/Tag × (100% + Zuschlag%))</p>
-                <p><strong>Beispiel:</strong> 220 Tage × 8h + 10 Samstage × 8h × 150% = 1.760h + 120h = 1.880h</p>
+                <p><strong>Arbeitsstunden berechnen:</strong></p>
+                <p className="pl-4">1. Normale Arbeitsstunden: Arbeitstage × Stunden/Tag</p>
+                <p className="pl-4">2. Samstags-Stunden (mit Zuschlag): Samstage × Stunden/Samstag × (100% + Samstags-Zuschlag%)</p>
+                <p className="pl-4">3. Überstunden-Zulage: (Normale Stunden + Samstags-Basisstunden) × Überstunden-Zulage%</p>
+                <p className="pl-4">4. Gesamtstunden: Summe aus 1 + 2 + 3</p>
+                <p><strong>Beispiel:</strong> 220 Tage × 8h = 1.760h | 10 Samstage × 5,5h × 150% = 82,5h | Überstunden-Zulage: (1.760h + 55h) × 25% = 454h | Gesamt: 2.296,5h</p>
                 <p><strong>Effektive Belastung:</strong> Stundenlohn × (1 − Grenzsteuersatz)</p>
               </div>
             </div>
