@@ -87,7 +87,7 @@ export default function FuhrparkRechner() {
       svAnteilAN: 20,
       privatStromAnteil: 30,
       geldwerterVorteilProzent: 0.25,
-      arbeitstage: 220,
+      arbeitstage: 250,
       stundenProTag: 8,
       samstage: 20,
       samstagStunden: 5.5,
@@ -803,7 +803,7 @@ export default function FuhrparkRechner() {
                 <p className="pl-4">3. Überstd.-berechtigt: (Samstage × Std/Samstag) + (Überstd/Monat × 12)</p>
                 <p className="pl-4">4. Überstunden-Zulage: Überstd.-berechtigte Stunden × Überstunden-Zulage%</p>
                 <p className="pl-4">5. Gesamtstunden: Summe aus 1 + 2 + 4</p>
-                <p><strong>Beispiel:</strong> 220 Tage × 8h = 1.760h | 20 Samstage × 5,5h × 150% = 165h | Berechtigt: (20×5,5h + 20h/Mon×12) = 350h | Zulage: 350h × 25% = 88h | Gesamt: 2.013h</p>
+                <p><strong>Beispiel:</strong> 250 Tage × 8h = 2.000h | 20 Samstage × 5,5h × 150% = 165h | Berechtigt: (20×5,5h + 20h/Mon×12) = 350h | Zulage: 350h × 25% = 88h | Gesamt: 2.253h</p>
                 <p><strong>Effektive Belastung:</strong> Stundenlohn × (1 − Grenzsteuersatz)</p>
               </div>
             </div>
