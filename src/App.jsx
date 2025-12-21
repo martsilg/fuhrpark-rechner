@@ -333,10 +333,10 @@ export default function FuhrparkRechner() {
             <InputField label="Samstags-Zuschlag" value={anEinstellungen.samstagZuschlag} onChange={(v) => setAnEinstellungen({...anEinstellungen, samstagZuschlag: v})} suffix="%" tooltip="Prozentualer Zuschlag für Samstagsarbeit (üblich: 50%)" />
             <InputField label="Überstunden-Zulage" value={anEinstellungen.ueberstundenZulage} onChange={(v) => setAnEinstellungen({...anEinstellungen, ueberstundenZulage: v})} suffix="%" tooltip="Prozentuale Zulage auf alle Arbeitsstunden (Standard: 25%)" />
             <InputField label="Grenzsteuersatz AN" value={anEinstellungen.steuersatzAN} onChange={(v) => setAnEinstellungen({...anEinstellungen, steuersatzAN: v})} suffix="%" tooltip="Grenzsteuersatz des Arbeitnehmers (Lohnsteuer + Solidaritätszuschlag)" />
-            <InputField label="Geldw. Vorteil Regel" value={anEinstellungen.geldwerterVorteilProzent} onChange={(v) => setAnEinstellungen({...anEinstellungen, geldwerterVorteilProzent: v})} suffix="%" step={0.25} tooltip="Prozentsatz für geldwerten Vorteil: E-Auto 0,25% | Hybrid 0,5% | Verbrenner 1%" />
+            <InputField label="Geldw. Vorteil Regel" value={anEinstellungen.geldwerterVorteilProzent} onChange={(v) => setAnEinstellungen({...anEinstellungen, geldwerterVorteilProzent: v})} suffix="%" step={0.25} tooltip="Monatlicher Prozentsatz vom Listenpreis für geldwerten Vorteil: E-Auto 0,25% | Hybrid 0,5% | Verbrenner 1%" />
             <InputField label="SV-Anteil Arbeitgeber" value={anEinstellungen.svAnteilAG} onChange={(v) => setAnEinstellungen({...anEinstellungen, svAnteilAG: v})} suffix="%" tooltip="Arbeitgeber-Anteil Sozialversicherung (Renten-, Kranken-, Pflege-, Arbeitslosenversicherung)" />
             <InputField label="SV-Anteil Arbeitnehmer" value={anEinstellungen.svAnteilAN} onChange={(v) => setAnEinstellungen({...anEinstellungen, svAnteilAN: v})} suffix="%" tooltip="Arbeitnehmer-Anteil Sozialversicherung (Renten-, Kranken-, Pflege-, Arbeitslosenversicherung)" />
-            <InputField label="Privater Stromanteil" value={anEinstellungen.privatStromAnteil} onChange={(v) => setAnEinstellungen({...anEinstellungen, privatStromAnteil: v})} suffix="%" tooltip="Geschätzter Anteil der privaten Fahrten, die zu Hause geladen werden" />
+            <InputField label="Privater Stromanteil" value={anEinstellungen.privatStromAnteil} onChange={(v) => setAnEinstellungen({...anEinstellungen, privatStromAnteil: v})} suffix="%" tooltip="Anteil des Stroms für private Fahrten, den der AN selbst bezahlt (ca. 30% wenn zu Hause geladen)" />
           </div>
           <div className="mt-3 p-3 bg-blue-50 rounded-lg text-sm space-y-1">
             <p><strong>Arbeitsstunden/Jahr:</strong> {berechnungen.arbeitsstundenJahr.toLocaleString('de-DE')} h
@@ -388,7 +388,7 @@ export default function FuhrparkRechner() {
 
           {/* Balkendiagramm */}
           <div className="bg-white rounded-lg p-4 mb-4">
-            <h3 className="text-base font-semibold text-gray-700 mb-2">Was kommt beim AN an? (bei gleichen AG-Ausgaben: {berechnungen.balkenData.agAusgabe.toLocaleString('de-DE')} €)</h3>
+            <h3 className="text-base font-semibold text-gray-700 mb-2">Was kommt beim AN an? (bei gleichen AG-Ausgaben pro MA: {berechnungen.balkenData.agAusgabe.toLocaleString('de-DE')} €/Jahr)</h3>
             <div className="flex gap-4 items-end justify-center h-80">
               {/* Lohnerhöhung Balken */}
               <div className="flex flex-col items-center">
@@ -479,7 +479,7 @@ export default function FuhrparkRechner() {
               <p className="text-sm text-red-500">{Math.round(berechnungen.verbrennerJahr.gesamt / 12).toLocaleString('de-DE')} €/Monat</p>
             </div>
             <div className="bg-white rounded-lg p-3 text-center">
-              <p className="text-xs text-gray-600">Kosten AN: E-Firmenwagen</p>
+              <p className="text-xs text-gray-600">Kosten AN: E-Firmenwagen (nur Steuer + Strom)</p>
               <p className="text-lg font-bold text-green-600">{berechnungen.fwKostenAN.toLocaleString('de-DE')} €/Jahr</p>
               <p className="text-sm text-green-500">{Math.round(berechnungen.fwKostenAN / 12).toLocaleString('de-DE')} €/Monat</p>
             </div>
