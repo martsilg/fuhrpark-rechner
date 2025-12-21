@@ -297,8 +297,8 @@ export default function FuhrparkRechner() {
             <InputField label="Mitarbeiter" value={unternehmen.mitarbeiter} onChange={(v) => setUnternehmen({...unternehmen, mitarbeiter: v})} suffix="MA" min={1} tooltip="Anzahl der Mitarbeiter mit Firmenwagen" />
             <InputField label="Grenzsteuersatz AG" value={unternehmen.grenzsteuersatz} onChange={(v) => setUnternehmen({...unternehmen, grenzsteuersatz: v})} suffix="%" tooltip="Grenzsteuersatz des Unternehmens (GmbH & Co. KG NRW: ~45%)" />
             <InputField label="Fuhrpark-Gehalt" value={unternehmen.fuhrparkGehalt} onChange={(v) => setUnternehmen({...unternehmen, fuhrparkGehalt: v})} suffix="€/Jahr" tooltip="Jahresgehalt Fuhrparkmanager inkl. AG-Anteile" />
-            <InputField label="Personal-Schwelle" value={unternehmen.personalSchwelle} onChange={(v) => setUnternehmen({...unternehmen, personalSchwelle: v})} suffix="MA" tooltip="Ab dieser Mitarbeiterzahl wird zusätzliches Personal benötigt" />
-            <InputField label="Zusatzpersonal-Kosten" value={unternehmen.zusatzPersonalKosten} onChange={(v) => setUnternehmen({...unternehmen, zusatzPersonalKosten: v})} suffix="€/Jahr" tooltip="Jahreskosten pro zusätzlicher Teilzeitkraft" />
+            <InputField label="Personal-Schwelle" value={unternehmen.personalSchwelle} onChange={(v) => setUnternehmen({...unternehmen, personalSchwelle: v})} suffix="MA" tooltip="Ab dieser Anzahl an Firmenfahrzeugen wird zusätzliches Personal für die Fuhrparkverwaltung benötigt" />
+            <InputField label="Zusatzpersonal-Kosten" value={unternehmen.zusatzPersonalKosten} onChange={(v) => setUnternehmen({...unternehmen, zusatzPersonalKosten: v})} suffix="€/Jahr" tooltip="Jahreskosten pro zusätzlicher Teilzeitkraft für die Fuhrparkverwaltung" />
           </div>
         </CollapsibleSection>
 
