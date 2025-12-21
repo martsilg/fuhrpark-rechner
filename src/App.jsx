@@ -372,8 +372,20 @@ export default function FuhrparkRechner() {
         </div>
 
         <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl shadow-lg p-4 border border-green-200">
-          <h2 className="text-lg font-bold text-gray-800 mb-3">🚗 Vorteil für Arbeitnehmer</h2>
-          
+          <div className="mb-3 flex items-center gap-3 flex-wrap">
+            <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+              🚗 Vorteil für Arbeitnehmer -
+              <input
+                type="number"
+                value={unternehmen.mitarbeiter}
+                onChange={(e) => setUnternehmen({...unternehmen, mitarbeiter: parseFloat(e.target.value) || 1})}
+                min={1}
+                className="w-20 px-2 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-center font-bold"
+              />
+              Mitarbeiter
+            </h2>
+          </div>
+
           {/* Balkendiagramm */}
           <div className="bg-white rounded-lg p-4 mb-4">
             <h3 className="text-base font-semibold text-gray-700 mb-2">Was kommt beim AN an? (bei gleichen AG-Ausgaben: {berechnungen.balkenData.agAusgabe.toLocaleString('de-DE')} €)</h3>
