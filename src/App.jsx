@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
-import { Car, Zap, Calculator, Building2, ChevronDown, ChevronUp, User, Info } from 'lucide-react';
+import { Car, Zap, Calculator, Building2, ChevronDown, ChevronUp, User, Info, Save, Upload, Download, FolderOpen } from 'lucide-react';
 
 const InputField = ({ label, value, onChange, suffix, min = 0, step = 1, tooltip, alignRight = false }) => (
   <div className="space-y-1">
@@ -97,6 +97,119 @@ export default function FuhrparkRechner() {
     ueberstundenMonat: 20,
     ueberstundenZulage: 25,
   });
+
+  const [savedConfigs, setSavedConfigs] = useState([]);
+  const [configName, setConfigName] = useState('');
+  const [showConfigMenu, setShowConfigMenu] = useState(false);
+
+  // Load saved configurations and auto-restore last state on mount
+  useEffect(() => {
+    try {
+      // Load auto-saved state
+      const autoSaved = localStorage.getItem('fuhrpark-autosave');
+      if (autoSaved) {
+        const data = JSON.parse(autoSaved);
+        if (data.fahrzeug) setFahrzeug(data.fahrzeug);
+        if (data.infrastruktur) setInfrastruktur(data.infrastruktur);
+        if (data.unternehmen) setUnternehmen(data.unternehmen);
+        if (data.verbrenner) setVerbrenner(data.verbrenner);
+        if (data.anEinstellungen) setAnEinstellungen(data.anEinstellungen);
+      }
+
+      // Load saved configurations list
+      const configs = localStorage.getItem('fuhrpark-configs');
+      if (configs) {
+        setSavedConfigs(JSON.parse(configs));
+      }
+    } catch (error) {
+      console.error('Error loading from localStorage:', error);
+    }
+  }, []);
+
+  // Auto-save current state whenever it changes
+  useEffect(() => {
+    try {
+      const data = { fahrzeug, infrastruktur, unternehmen, verbrenner, anEinstellungen };
+      localStorage.setItem('fuhrpark-autosave', JSON.stringify(data));
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+    }
+  }, [fahrzeug, infrastruktur, unternehmen, verbrenner, anEinstellungen]);
+
+  // Save named configuration
+  const saveConfiguration = () => {
+    if (!configName.trim()) {
+      alert('Bitte geben Sie einen Namen für die Konfiguration ein.');
+      return;
+    }
+
+    const newConfig = {
+      name: configName,
+      timestamp: new Date().toISOString(),
+      data: { fahrzeug, infrastruktur, unternehmen, verbrenner, anEinstellungen }
+    };
+
+    const updatedConfigs = [...savedConfigs.filter(c => c.name !== configName), newConfig];
+    setSavedConfigs(updatedConfigs);
+    localStorage.setItem('fuhrpark-configs', JSON.stringify(updatedConfigs));
+    setConfigName('');
+    alert(`Konfiguration "${newConfig.name}" wurde gespeichert.`);
+  };
+
+  // Load named configuration
+  const loadConfiguration = (config) => {
+    if (confirm(`Konfiguration "${config.name}" laden? Aktuelle Änderungen werden überschrieben.`)) {
+      setFahrzeug(config.data.fahrzeug);
+      setInfrastruktur(config.data.infrastruktur);
+      setUnternehmen(config.data.unternehmen);
+      setVerbrenner(config.data.verbrenner);
+      setAnEinstellungen(config.data.anEinstellungen);
+    }
+  };
+
+  // Delete configuration
+  const deleteConfiguration = (configToDelete) => {
+    if (confirm(`Konfiguration "${configToDelete.name}" wirklich löschen?`)) {
+      const updatedConfigs = savedConfigs.filter(c => c.name !== configToDelete.name);
+      setSavedConfigs(updatedConfigs);
+      localStorage.setItem('fuhrpark-configs', JSON.stringify(updatedConfigs));
+    }
+  };
+
+  // Export configuration as JSON
+  const exportConfiguration = () => {
+    const data = { fahrzeug, infrastruktur, unternehmen, verbrenner, anEinstellungen };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `fuhrpark-config-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Import configuration from JSON
+  const importConfiguration = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (data.fahrzeug) setFahrzeug(data.fahrzeug);
+        if (data.infrastruktur) setInfrastruktur(data.infrastruktur);
+        if (data.unternehmen) setUnternehmen(data.unternehmen);
+        if (data.verbrenner) setVerbrenner(data.verbrenner);
+        if (data.anEinstellungen) setAnEinstellungen(data.anEinstellungen);
+        alert('Konfiguration erfolgreich importiert!');
+      } catch (error) {
+        alert('Fehler beim Importieren: Ungültige Datei');
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = ''; // Reset input
+  };
 
   const berechnungen = useMemo(() => {
     const steuersatz = unternehmen.grenzsteuersatz / 100;
@@ -218,7 +331,107 @@ export default function FuhrparkRechner() {
       </header>
 
       <main className="max-w-4xl mx-auto py-6 px-4 space-y-4">
-        
+
+        {/* Configuration Management */}
+        <div className="bg-white rounded-xl shadow-lg p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Save className="w-5 h-5 text-blue-600" />
+            <h2 className="text-lg font-semibold text-gray-800">Konfigurationen</h2>
+            <button
+              onClick={() => setShowConfigMenu(!showConfigMenu)}
+              className="ml-auto text-sm px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              {showConfigMenu ? 'Ausblenden' : 'Verwalten'}
+            </button>
+          </div>
+
+          {showConfigMenu && (
+            <div className="space-y-3">
+              {/* Save Configuration */}
+              <div className="border-t pt-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Aktuelle Konfiguration speichern</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={configName}
+                    onChange={(e) => setConfigName(e.target.value)}
+                    placeholder="Konfigurationsname..."
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    onKeyPress={(e) => e.key === 'Enter' && saveConfiguration()}
+                  />
+                  <button
+                    onClick={saveConfiguration}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+                  >
+                    <Save className="w-4 h-4" />
+                    Speichern
+                  </button>
+                </div>
+              </div>
+
+              {/* Saved Configurations List */}
+              {savedConfigs.length > 0 && (
+                <div className="border-t pt-3">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Gespeicherte Konfigurationen</label>
+                  <div className="space-y-2">
+                    {savedConfigs.map((config, index) => (
+                      <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+                        <FolderOpen className="w-4 h-4 text-gray-600" />
+                        <div className="flex-1">
+                          <div className="font-medium text-sm">{config.name}</div>
+                          <div className="text-xs text-gray-500">
+                            {new Date(config.timestamp).toLocaleDateString('de-DE', {
+                              year: 'numeric', month: '2-digit', day: '2-digit',
+                              hour: '2-digit', minute: '2-digit'
+                            })}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => loadConfiguration(config)}
+                          className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                        >
+                          Laden
+                        </button>
+                        <button
+                          onClick={() => deleteConfiguration(config)}
+                          className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                        >
+                          Löschen
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Export/Import */}
+              <div className="border-t pt-3 flex gap-2">
+                <button
+                  onClick={exportConfiguration}
+                  className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center justify-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Exportieren (JSON)
+                </button>
+                <label className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center justify-center gap-2 cursor-pointer">
+                  <Upload className="w-4 h-4" />
+                  Importieren (JSON)
+                  <input
+                    type="file"
+                    accept=".json"
+                    onChange={importConfiguration}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+
+              <div className="text-xs text-gray-500 bg-blue-50 p-2 rounded">
+                💡 Ihre Einstellungen werden automatisch im Browser gespeichert und beim nächsten Besuch wiederhergestellt.
+              </div>
+            </div>
+          )}
+        </div>
+
         <div className="bg-white rounded-xl shadow-lg p-4">
           <div className="mb-3 flex items-center gap-3">
             <Calculator className="w-5 h-5 text-blue-600 flex-shrink-0" />
