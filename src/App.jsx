@@ -9,9 +9,9 @@ const InputField = ({ label, value, onChange, suffix, min = 0, step = 1, tooltip
       {tooltip && (
         <div className="relative group">
           <Info className="w-4 h-4 text-gray-400 hover:text-blue-600 cursor-help" />
-          <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10">
+          <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block w-64 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10">
             {tooltip}
-            <div className="absolute top-full left-4 -mt-1 border-4 border-transparent border-t-gray-800"></div>
+            <div className="absolute top-full right-4 -mt-1 border-4 border-transparent border-t-gray-800"></div>
           </div>
         </div>
       )}
