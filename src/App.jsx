@@ -94,18 +94,21 @@ export default function FuhrparkRechner() {
     samstage: 20,
     samstagStunden: 5.5,
     samstagZuschlag: 50,
+    ueberstundenMonat: 20,
     ueberstundenZulage: 25,
-    ueberstundenZulageFaehigeStunden: 454,
   });
 
   const berechnungen = useMemo(() => {
     const steuersatz = unternehmen.grenzsteuersatz / 100;
     const leasingBrutto = fahrzeug.leasingNetto * 1.19;
-    
+
     // Arbeitsstunden berechnen (mit Samstags-Zuschlag und Überstunden-Zulage)
     const normaleStunden = anEinstellungen.arbeitstage * anEinstellungen.stundenProTag;
-    const samstagsStundenEffektiv = anEinstellungen.samstage * anEinstellungen.samstagStunden * (1 + anEinstellungen.samstagZuschlag / 100);
-    const ueberstundenEffektiv = anEinstellungen.ueberstundenZulageFaehigeStunden * (anEinstellungen.ueberstundenZulage / 100);
+    const samstagsStundenBasis = anEinstellungen.samstage * anEinstellungen.samstagStunden;
+    const samstagsStundenEffektiv = samstagsStundenBasis * (1 + anEinstellungen.samstagZuschlag / 100);
+    const ueberstundenJahr = anEinstellungen.ueberstundenMonat * 12;
+    const ueberstundenZulageFaehigeStunden = samstagsStundenBasis + ueberstundenJahr;
+    const ueberstundenEffektiv = ueberstundenZulageFaehigeStunden * (anEinstellungen.ueberstundenZulage / 100);
     const arbeitsstundenJahr = normaleStunden + samstagsStundenEffektiv + ueberstundenEffektiv;
     
     const leasingJahr = leasingBrutto * 12;
@@ -184,7 +187,7 @@ export default function FuhrparkRechner() {
       }
     };
     
-    return { aktuell, graphData, verbrennerJahr, fwKostenAN: Math.round(fwKostenAN), ersparnis: Math.round(ersparnis), steuersatz, leasingBrutto: Math.round(leasingBrutto), balkenData, geldwerterVorteil: Math.round(geldwerterVorteil), steuerAN: Math.round(steuerAN), arbeitsstundenJahr: Math.round(arbeitsstundenJahr) };
+    return { aktuell, graphData, verbrennerJahr, fwKostenAN: Math.round(fwKostenAN), ersparnis: Math.round(ersparnis), steuersatz, leasingBrutto: Math.round(leasingBrutto), balkenData, geldwerterVorteil: Math.round(geldwerterVorteil), steuerAN: Math.round(steuerAN), arbeitsstundenJahr: Math.round(arbeitsstundenJahr), ueberstundenZulageFaehigeStunden: Math.round(ueberstundenZulageFaehigeStunden) };
   }, [fahrzeug, infrastruktur, unternehmen, verbrenner, anEinstellungen]);
 
   const CustomTooltip = ({ active, payload }) => {
@@ -326,9 +329,30 @@ export default function FuhrparkRechner() {
             <InputField label="Samstage/Jahr" value={anEinstellungen.samstage} onChange={(v) => setAnEinstellungen({...anEinstellungen, samstage: v})} suffix="Tage" tooltip="Anzahl der zusätzlichen Samstagsarbeitstage pro Jahr" />
             <InputField label="Stunden/Samstag" value={anEinstellungen.samstagStunden} onChange={(v) => setAnEinstellungen({...anEinstellungen, samstagStunden: v})} suffix="h" step={0.5} tooltip="Arbeitsstunden pro Samstag (Standard: 5,5h)" alignRight={true} />
             <InputField label="Samstags-Zuschlag" value={anEinstellungen.samstagZuschlag} onChange={(v) => setAnEinstellungen({...anEinstellungen, samstagZuschlag: v})} suffix="%" tooltip="Prozentualer Zuschlag für Samstagsarbeit (üblich: 50%)" />
-            <InputField label="Überstunden-Zulage" value={anEinstellungen.ueberstundenZulage} onChange={(v) => setAnEinstellungen({...anEinstellungen, ueberstundenZulage: v})} suffix="%" tooltip="Prozentuale Zulage auf Überstunden-Zulage-fähige Stunden (Standard: 25%)" alignRight={true} />
-            <InputField label="Davon Überstd.-berechtigt" value={anEinstellungen.ueberstundenZulageFaehigeStunden} onChange={(v) => setAnEinstellungen({...anEinstellungen, ueberstundenZulageFaehigeStunden: v})} suffix="h" tooltip="Anzahl der Stunden pro Jahr, die für die Überstunden-Zulage berechtigt sind" />
-            <InputField label="Steuersatz Mitarbeiter" value={anEinstellungen.steuersatzAN} onChange={(v) => setAnEinstellungen({...anEinstellungen, steuersatzAN: v})} suffix="%" tooltip="Persönlicher Steuersatz des Mitarbeiters (Lohnsteuer + Solidaritätszuschlag, typisch: 30-42%)" alignRight={true} />
+            <InputField label="Überstunden/Monat" value={anEinstellungen.ueberstundenMonat} onChange={(v) => setAnEinstellungen({...anEinstellungen, ueberstundenMonat: v})} suffix="h" tooltip="Durchschnittliche Überstunden pro Monat (ohne Samstage)" alignRight={true} />
+            <InputField label="Überstunden-Zulage" value={anEinstellungen.ueberstundenZulage} onChange={(v) => setAnEinstellungen({...anEinstellungen, ueberstundenZulage: v})} suffix="%" tooltip="Prozentuale Zulage auf Überstunden-Zulage-fähige Stunden (Standard: 25%)" />
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-gray-700 flex items-center gap-1">
+                Davon Überstd.-berechtigt
+                <div className="relative group">
+                  <Info className="w-4 h-4 text-gray-400 hover:text-blue-600 cursor-help" />
+                  <div className={`absolute right-0 bottom-full mb-2 hidden group-hover:block w-64 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10`}>
+                    Berechnet aus: Samstags-Basis-Stunden + (Überstunden/Monat × 12). Diese Stunden sind berechtigt für die Überstunden-Zulage.
+                    <div className={`absolute top-full right-4 -mt-1 border-4 border-transparent border-t-gray-800`}></div>
+                  </div>
+                </div>
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  value={berechnungen.ueberstundenZulageFaehigeStunden}
+                  disabled
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-blue-50 text-blue-700 pr-16 text-base cursor-not-allowed"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">h</span>
+              </div>
+            </div>
+            <InputField label="Steuersatz Mitarbeiter" value={anEinstellungen.steuersatzAN} onChange={(v) => setAnEinstellungen({...anEinstellungen, steuersatzAN: v})} suffix="%" tooltip="Persönlicher Steuersatz des Mitarbeiters (Lohnsteuer + Solidaritätszuschlag, typisch: 30-42%)" />
             <InputField label="Geldw. Vorteil Regel" value={anEinstellungen.geldwerterVorteilProzent} onChange={(v) => setAnEinstellungen({...anEinstellungen, geldwerterVorteilProzent: v})} suffix="%" step={0.25} tooltip="Monatlicher Prozentsatz vom Listenpreis für geldwerten Vorteil: E-Auto 0,25% | Hybrid 0,5% | Verbrenner 1%" alignRight={true} />
             <InputField label="SV-Anteil Arbeitgeber" value={anEinstellungen.svAnteilAG} onChange={(v) => setAnEinstellungen({...anEinstellungen, svAnteilAG: v})} suffix="%" tooltip="Arbeitgeber-Anteil Sozialversicherung (Renten-, Kranken-, Pflege-, Arbeitslosenversicherung)" />
             <InputField label="SV-Anteil Arbeitnehmer" value={anEinstellungen.svAnteilAN} onChange={(v) => setAnEinstellungen({...anEinstellungen, svAnteilAN: v})} suffix="%" tooltip="Arbeitnehmer-Anteil Sozialversicherung (Renten-, Kranken-, Pflege-, Arbeitslosenversicherung)" alignRight={true} />
@@ -343,7 +367,8 @@ export default function FuhrparkRechner() {
                     <br />• Samstage: {anEinstellungen.samstage} Tage × {anEinstellungen.samstagStunden}h × {100 + anEinstellungen.samstagZuschlag}% = {Math.round(anEinstellungen.samstage * anEinstellungen.samstagStunden * (1 + anEinstellungen.samstagZuschlag / 100)).toLocaleString('de-DE')} h
                   </>
                 )}
-                <br />• Überstunden-Zulage: {anEinstellungen.ueberstundenZulage}% auf {anEinstellungen.ueberstundenZulageFaehigeStunden.toLocaleString('de-DE')} h = {Math.round(anEinstellungen.ueberstundenZulageFaehigeStunden * (anEinstellungen.ueberstundenZulage / 100)).toLocaleString('de-DE')} h
+                <br />• Überstunden-Zulage: {anEinstellungen.ueberstundenZulage}% auf {berechnungen.ueberstundenZulageFaehigeStunden.toLocaleString('de-DE')} h = {Math.round(berechnungen.ueberstundenZulageFaehigeStunden * (anEinstellungen.ueberstundenZulage / 100)).toLocaleString('de-DE')} h
+                <br />  <span className="text-xs">({anEinstellungen.samstage} × {anEinstellungen.samstagStunden}h + {anEinstellungen.ueberstundenMonat}h/Mon × 12 = {berechnungen.ueberstundenZulageFaehigeStunden}h berechtigt)</span>
               </span>
             </p>
             <p><strong>Geldwerter Vorteil:</strong> {berechnungen.geldwerterVorteil.toLocaleString('de-DE')} €/Jahr ({fahrzeug.bruttolistenpreis.toLocaleString('de-DE')} € × {anEinstellungen.geldwerterVorteilProzent}% × 12)</p>
@@ -536,9 +561,10 @@ export default function FuhrparkRechner() {
                 <p><strong>Arbeitsstunden berechnen:</strong></p>
                 <p className="pl-4">1. Normale Arbeitsstunden: Arbeitstage × Stunden/Tag</p>
                 <p className="pl-4">2. Samstags-Stunden (mit Zuschlag): Samstage × Stunden/Samstag × (100% + Samstags-Zuschlag%)</p>
-                <p className="pl-4">3. Überstunden-Zulage: Überstd.-berechtigte Stunden × Überstunden-Zulage%</p>
-                <p className="pl-4">4. Gesamtstunden: Summe aus 1 + 2 + 3</p>
-                <p><strong>Beispiel:</strong> 220 Tage × 8h = 1.760h | 20 Samstage × 5,5h × 150% = 165h | Überstunden-Zulage: 454h × 25% = 114h | Gesamt: 2.039h</p>
+                <p className="pl-4">3. Überstd.-berechtigt: (Samstage × Std/Samstag) + (Überstd/Monat × 12)</p>
+                <p className="pl-4">4. Überstunden-Zulage: Überstd.-berechtigte Stunden × Überstunden-Zulage%</p>
+                <p className="pl-4">5. Gesamtstunden: Summe aus 1 + 2 + 4</p>
+                <p><strong>Beispiel:</strong> 220 Tage × 8h = 1.760h | 20 Samstage × 5,5h × 150% = 165h | Berechtigt: (20×5,5h + 20h/Mon×12) = 350h | Zulage: 350h × 25% = 88h | Gesamt: 2.013h</p>
                 <p><strong>Effektive Belastung:</strong> Stundenlohn × (1 − Grenzsteuersatz)</p>
               </div>
             </div>
