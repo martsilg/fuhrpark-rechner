@@ -536,9 +536,9 @@ export default function FuhrparkRechner() {
                 <p><strong>Arbeitsstunden berechnen:</strong></p>
                 <p className="pl-4">1. Normale Arbeitsstunden: Arbeitstage × Stunden/Tag</p>
                 <p className="pl-4">2. Samstags-Stunden (mit Zuschlag): Samstage × Stunden/Samstag × (100% + Samstags-Zuschlag%)</p>
-                <p className="pl-4">3. Überstunden-Zulage: (Normale Stunden + Samstags-Basisstunden) × Überstunden-Zulage%</p>
+                <p className="pl-4">3. Überstunden-Zulage: Überstd.-berechtigte Stunden × Überstunden-Zulage%</p>
                 <p className="pl-4">4. Gesamtstunden: Summe aus 1 + 2 + 3</p>
-                <p><strong>Beispiel:</strong> 220 Tage × 8h = 1.760h | 10 Samstage × 5,5h × 150% = 82,5h | Überstunden-Zulage: (1.760h + 55h) × 25% = 454h | Gesamt: 2.296,5h</p>
+                <p><strong>Beispiel:</strong> 220 Tage × 8h = 1.760h | 20 Samstage × 5,5h × 150% = 165h | Überstunden-Zulage: 454h × 25% = 114h | Gesamt: 2.039h</p>
                 <p><strong>Effektive Belastung:</strong> Stundenlohn × (1 − Grenzsteuersatz)</p>
               </div>
             </div>
