@@ -2,16 +2,16 @@ import React, { useState, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
 import { Car, Zap, Calculator, Building2, ChevronDown, ChevronUp, User, Info } from 'lucide-react';
 
-const InputField = ({ label, value, onChange, suffix, min = 0, step = 1, tooltip }) => (
+const InputField = ({ label, value, onChange, suffix, min = 0, step = 1, tooltip, alignRight = false }) => (
   <div className="space-y-1">
     <label className="block text-sm font-medium text-gray-700 flex items-center gap-1">
       {label}
       {tooltip && (
         <div className="relative group">
           <Info className="w-4 h-4 text-gray-400 hover:text-blue-600 cursor-help" />
-          <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block w-64 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10">
+          <div className={`absolute ${alignRight ? 'right-0' : 'left-0'} bottom-full mb-2 hidden group-hover:block w-64 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10`}>
             {tooltip}
-            <div className="absolute top-full right-4 -mt-1 border-4 border-transparent border-t-gray-800"></div>
+            <div className={`absolute top-full ${alignRight ? 'right-4' : 'left-4'} -mt-1 border-4 border-transparent border-t-gray-800`}></div>
           </div>
         </div>
       )}
@@ -256,38 +256,32 @@ export default function FuhrparkRechner() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Fahrzeugname</label>
               <input type="text" value={fahrzeug.name} onChange={(e) => setFahrzeug({...fahrzeug, name: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-base" />
             </div>
+            <InputField label="Leasing (netto)" value={fahrzeug.leasingNetto} onChange={(v) => setFahrzeug({...fahrzeug, leasingNetto: v})} suffix="€/Mon" tooltip="Monatliche Netto-Leasingrate (ohne MwSt)" />
             <div className="space-y-1">
               <label className="block text-sm font-medium text-gray-700 flex items-center gap-1">
-                Leasing (netto)
+                Leasing (brutto)
                 <div className="relative group">
                   <Info className="w-4 h-4 text-gray-400 hover:text-blue-600 cursor-help" />
-                  <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10">
-                    Monatliche Netto-Leasingrate (ohne MwSt). Der Brutto-Wert wird automatisch berechnet.
-                    <div className="absolute top-full left-4 -mt-1 border-4 border-transparent border-t-gray-800"></div>
+                  <div className={`absolute right-0 bottom-full mb-2 hidden group-hover:block w-64 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg z-10`}>
+                    Monatliche Brutto-Leasingrate (inkl. 19% MwSt) - wird automatisch berechnet
+                    <div className={`absolute top-full right-4 -mt-1 border-4 border-transparent border-t-gray-800`}></div>
                   </div>
                 </div>
               </label>
-              <div className="flex items-center gap-2">
-                <div className="relative flex-1">
-                  <input
-                    type="number"
-                    value={fahrzeug.leasingNetto}
-                    onChange={(e) => setFahrzeug({...fahrzeug, leasingNetto: parseFloat(e.target.value) || 0})}
-                    min={0}
-                    step={1}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-16 text-base"
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">€/Mon</span>
-                </div>
-                <div className="text-sm text-blue-700 bg-blue-50 px-3 py-2 rounded-lg border border-blue-200 whitespace-nowrap">
-                  Brutto: {berechnungen.leasingBrutto} €
-                </div>
+              <div className="relative">
+                <input
+                  type="number"
+                  value={berechnungen.leasingBrutto}
+                  disabled
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-blue-50 text-blue-700 pr-16 text-base cursor-not-allowed"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">€/Mon</span>
               </div>
             </div>
             <InputField label="Laufzeit" value={fahrzeug.laufzeitMonate} onChange={(v) => setFahrzeug({...fahrzeug, laufzeitMonate: v})} suffix="Mon" tooltip="Laufzeit des Leasingvertrags in Monaten" />
-            <InputField label="km/Jahr" value={fahrzeug.fahrleistung} onChange={(v) => setFahrzeug({...fahrzeug, fahrleistung: v})} suffix="km" step={1000} tooltip="Jährliche Fahrleistung pro Fahrzeug" />
+            <InputField label="km/Jahr" value={fahrzeug.fahrleistung} onChange={(v) => setFahrzeug({...fahrzeug, fahrleistung: v})} suffix="km" step={1000} tooltip="Jährliche Fahrleistung pro Fahrzeug" alignRight={true} />
             <InputField label="Überführung" value={fahrzeug.ueberfuehrung} onChange={(v) => setFahrzeug({...fahrzeug, ueberfuehrung: v})} suffix="€" tooltip="Einmalige Überführungskosten pro Fahrzeug" />
-            <InputField label="Listenpreis (UVP)" value={fahrzeug.bruttolistenpreis} onChange={(v) => setFahrzeug({...fahrzeug, bruttolistenpreis: v})} suffix="€" tooltip="Unverbindliche Preisempfehlung des Herstellers - wichtig für die Berechnung des geldwerten Vorteils (0,25%-Regel bei E-Autos)" />
+            <InputField label="Listenpreis (UVP)" value={fahrzeug.bruttolistenpreis} onChange={(v) => setFahrzeug({...fahrzeug, bruttolistenpreis: v})} suffix="€" tooltip="Unverbindliche Preisempfehlung des Herstellers - wichtig für die Berechnung des geldwerten Vorteils (0,25%-Regel bei E-Autos)" alignRight={true} />
             <InputField label="Verbrauch" value={fahrzeug.verbrauch} onChange={(v) => setFahrzeug({...fahrzeug, verbrauch: v})} suffix="kWh/100km" tooltip="Durchschnittlicher Stromverbrauch pro 100 km" />
           </div>
         </CollapsibleSection>
@@ -295,9 +289,9 @@ export default function FuhrparkRechner() {
         <CollapsibleSection title="Unternehmen" icon={Building2}>
           <div className="grid grid-cols-2 gap-3">
             <InputField label="Mitarbeiter" value={unternehmen.mitarbeiter} onChange={(v) => setUnternehmen({...unternehmen, mitarbeiter: v})} suffix="MA" min={1} tooltip="Anzahl der Mitarbeiter mit Firmenwagen" />
-            <InputField label="Steuersatz Unternehmen" value={unternehmen.grenzsteuersatz} onChange={(v) => setUnternehmen({...unternehmen, grenzsteuersatz: v})} suffix="%" tooltip="Steuersatz des Unternehmens auf Gewinne (GmbH & Co. KG in NRW: ca. 45% - Einkommensteuer + Gewerbesteuer)" />
+            <InputField label="Steuersatz Unternehmen" value={unternehmen.grenzsteuersatz} onChange={(v) => setUnternehmen({...unternehmen, grenzsteuersatz: v})} suffix="%" tooltip="Steuersatz des Unternehmens auf Gewinne (GmbH & Co. KG in NRW: ca. 45% - Einkommensteuer + Gewerbesteuer)" alignRight={true} />
             <InputField label="Fuhrpark-Gehalt" value={unternehmen.fuhrparkGehalt} onChange={(v) => setUnternehmen({...unternehmen, fuhrparkGehalt: v})} suffix="€/Jahr" tooltip="Jahresgehalt Fuhrparkmanager inkl. AG-Anteile" />
-            <InputField label="Personal-Schwelle" value={unternehmen.personalSchwelle} onChange={(v) => setUnternehmen({...unternehmen, personalSchwelle: v})} suffix="MA" tooltip="Ab dieser Anzahl an Firmenfahrzeugen wird zusätzliches Personal für die Fuhrparkverwaltung benötigt" />
+            <InputField label="Personal-Schwelle" value={unternehmen.personalSchwelle} onChange={(v) => setUnternehmen({...unternehmen, personalSchwelle: v})} suffix="MA" tooltip="Ab dieser Anzahl an Firmenfahrzeugen wird zusätzliches Personal für die Fuhrparkverwaltung benötigt" alignRight={true} />
             <InputField label="Zusatzpersonal-Kosten" value={unternehmen.zusatzPersonalKosten} onChange={(v) => setUnternehmen({...unternehmen, zusatzPersonalKosten: v})} suffix="€/Jahr" tooltip="Jahreskosten pro zusätzlicher Teilzeitkraft für die Fuhrparkverwaltung" />
           </div>
         </CollapsibleSection>
@@ -305,37 +299,37 @@ export default function FuhrparkRechner() {
         <CollapsibleSection title="Infrastruktur" icon={Zap} defaultOpen={false}>
           <div className="grid grid-cols-2 gap-3">
             <InputField label="Wallbox Firma" value={infrastruktur.wallboxFirma} onChange={(v) => setInfrastruktur({...infrastruktur, wallboxFirma: v})} suffix="€" tooltip="Kosten pro Ladepunkt auf dem Firmengelände (1 Ladepunkt für je 2 Mitarbeiter)" />
-            <InputField label="Wallbox Zuhause" value={infrastruktur.wallboxZuhause} onChange={(v) => setInfrastruktur({...infrastruktur, wallboxZuhause: v})} suffix="€" tooltip="Kosten für Wallbox-Installation beim Mitarbeiter zu Hause (pro Mitarbeiter)" />
+            <InputField label="Wallbox Zuhause" value={infrastruktur.wallboxZuhause} onChange={(v) => setInfrastruktur({...infrastruktur, wallboxZuhause: v})} suffix="€" tooltip="Kosten für Wallbox-Installation beim Mitarbeiter zu Hause (pro Mitarbeiter)" alignRight={true} />
             <InputField label="Abschreibung" value={infrastruktur.abschreibungJahre} onChange={(v) => setInfrastruktur({...infrastruktur, abschreibungJahre: v})} suffix="Jahre" tooltip="Abschreibungszeitraum für Wallbox-Investitionen" />
-            <InputField label="Strompreis" value={infrastruktur.strompreis} onChange={(v) => setInfrastruktur({...infrastruktur, strompreis: v})} suffix="€/kWh" step={0.01} tooltip="Strompreis pro Kilowattstunde (Firmentarif)" />
+            <InputField label="Strompreis" value={infrastruktur.strompreis} onChange={(v) => setInfrastruktur({...infrastruktur, strompreis: v})} suffix="€/kWh" step={0.01} tooltip="Strompreis pro Kilowattstunde (Firmentarif)" alignRight={true} />
             <InputField label="Ladekarten-Pauschale" value={infrastruktur.ladekartenMonat} onChange={(v) => setInfrastruktur({...infrastruktur, ladekartenMonat: v})} suffix="€/Mon" tooltip="Monatliche Pauschale für öffentliche Ladekarten pro Mitarbeiter" />
-            <InputField label="Flottenversicherung" value={infrastruktur.versicherungMonat} onChange={(v) => setInfrastruktur({...infrastruktur, versicherungMonat: v})} suffix="€/Mon" tooltip="Vollkasko-Versicherung pro Fahrzeug pro Monat" />
+            <InputField label="Flottenversicherung" value={infrastruktur.versicherungMonat} onChange={(v) => setInfrastruktur({...infrastruktur, versicherungMonat: v})} suffix="€/Mon" tooltip="Vollkasko-Versicherung pro Fahrzeug pro Monat" alignRight={true} />
           </div>
         </CollapsibleSection>
 
         <CollapsibleSection title="Vergleichs-Verbrenner" icon={Car} defaultOpen={false}>
           <div className="grid grid-cols-2 gap-3">
             <InputField label="Leasing/Finanzierung" value={verbrenner.leasingMonat} onChange={(v) => setVerbrenner({...verbrenner, leasingMonat: v})} suffix="€/Mon" tooltip="Monatliche Leasing- oder Finanzierungsrate für Verbrenner" />
-            <InputField label="Versicherung" value={verbrenner.versicherungMonat} onChange={(v) => setVerbrenner({...verbrenner, versicherungMonat: v})} suffix="€/Mon" tooltip="Monatliche Vollkasko-Versicherung (privat gezahlt)" />
+            <InputField label="Versicherung" value={verbrenner.versicherungMonat} onChange={(v) => setVerbrenner({...verbrenner, versicherungMonat: v})} suffix="€/Mon" tooltip="Monatliche Vollkasko-Versicherung (privat gezahlt)" alignRight={true} />
             <InputField label="KFZ-Steuer" value={verbrenner.kfzSteuer} onChange={(v) => setVerbrenner({...verbrenner, kfzSteuer: v})} suffix="€/Jahr" tooltip="Jährliche KFZ-Steuer für Verbrenner-Fahrzeug" />
-            <InputField label="Wartung & Verschleiß" value={verbrenner.wartung} onChange={(v) => setVerbrenner({...verbrenner, wartung: v})} suffix="€/Jahr" tooltip="Jährliche Wartungskosten (Ölwechsel, Bremsen, Filter, etc.)" />
+            <InputField label="Wartung & Verschleiß" value={verbrenner.wartung} onChange={(v) => setVerbrenner({...verbrenner, wartung: v})} suffix="€/Jahr" tooltip="Jährliche Wartungskosten (Ölwechsel, Bremsen, Filter, etc.)" alignRight={true} />
             <InputField label="Verbrauch" value={verbrenner.verbrauchL} onChange={(v) => setVerbrenner({...verbrenner, verbrauchL: v})} suffix="L/100km" step={0.5} tooltip="Durchschnittlicher Kraftstoffverbrauch pro 100 km" />
-            <InputField label="Spritpreis" value={verbrenner.spritpreis} onChange={(v) => setVerbrenner({...verbrenner, spritpreis: v})} suffix="€/L" step={0.05} tooltip="Aktueller Preis pro Liter Benzin/Diesel" />
+            <InputField label="Spritpreis" value={verbrenner.spritpreis} onChange={(v) => setVerbrenner({...verbrenner, spritpreis: v})} suffix="€/L" step={0.05} tooltip="Aktueller Preis pro Liter Benzin/Diesel" alignRight={true} />
           </div>
         </CollapsibleSection>
 
         <CollapsibleSection title="Arbeitnehmer-Berechnungsgrundlagen" icon={User} defaultOpen={false}>
           <div className="grid grid-cols-2 gap-3">
             <InputField label="Arbeitstage/Jahr" value={anEinstellungen.arbeitstage} onChange={(v) => setAnEinstellungen({...anEinstellungen, arbeitstage: v})} suffix="Tage" tooltip="Anzahl der normalen Arbeitstage pro Jahr (Montag-Freitag)" />
-            <InputField label="Stunden/Tag" value={anEinstellungen.stundenProTag} onChange={(v) => setAnEinstellungen({...anEinstellungen, stundenProTag: v})} suffix="h" tooltip="Arbeitsstunden pro normalem Arbeitstag" />
+            <InputField label="Stunden/Tag" value={anEinstellungen.stundenProTag} onChange={(v) => setAnEinstellungen({...anEinstellungen, stundenProTag: v})} suffix="h" tooltip="Arbeitsstunden pro normalem Arbeitstag" alignRight={true} />
             <InputField label="Samstage/Jahr" value={anEinstellungen.samstage} onChange={(v) => setAnEinstellungen({...anEinstellungen, samstage: v})} suffix="Tage" tooltip="Anzahl der zusätzlichen Samstagsarbeitstage pro Jahr" />
-            <InputField label="Stunden/Samstag" value={anEinstellungen.samstagStunden} onChange={(v) => setAnEinstellungen({...anEinstellungen, samstagStunden: v})} suffix="h" step={0.5} tooltip="Arbeitsstunden pro Samstag (Standard: 5,5h)" />
+            <InputField label="Stunden/Samstag" value={anEinstellungen.samstagStunden} onChange={(v) => setAnEinstellungen({...anEinstellungen, samstagStunden: v})} suffix="h" step={0.5} tooltip="Arbeitsstunden pro Samstag (Standard: 5,5h)" alignRight={true} />
             <InputField label="Samstags-Zuschlag" value={anEinstellungen.samstagZuschlag} onChange={(v) => setAnEinstellungen({...anEinstellungen, samstagZuschlag: v})} suffix="%" tooltip="Prozentualer Zuschlag für Samstagsarbeit (üblich: 50%)" />
-            <InputField label="Überstunden-Zulage" value={anEinstellungen.ueberstundenZulage} onChange={(v) => setAnEinstellungen({...anEinstellungen, ueberstundenZulage: v})} suffix="%" tooltip="Prozentuale Zulage auf alle Arbeitsstunden (Standard: 25%)" />
+            <InputField label="Überstunden-Zulage" value={anEinstellungen.ueberstundenZulage} onChange={(v) => setAnEinstellungen({...anEinstellungen, ueberstundenZulage: v})} suffix="%" tooltip="Prozentuale Zulage auf alle Arbeitsstunden (Standard: 25%)" alignRight={true} />
             <InputField label="Steuersatz Mitarbeiter" value={anEinstellungen.steuersatzAN} onChange={(v) => setAnEinstellungen({...anEinstellungen, steuersatzAN: v})} suffix="%" tooltip="Persönlicher Steuersatz des Mitarbeiters (Lohnsteuer + Solidaritätszuschlag, typisch: 30-42%)" />
-            <InputField label="Geldw. Vorteil Regel" value={anEinstellungen.geldwerterVorteilProzent} onChange={(v) => setAnEinstellungen({...anEinstellungen, geldwerterVorteilProzent: v})} suffix="%" step={0.25} tooltip="Monatlicher Prozentsatz vom Listenpreis für geldwerten Vorteil: E-Auto 0,25% | Hybrid 0,5% | Verbrenner 1%" />
+            <InputField label="Geldw. Vorteil Regel" value={anEinstellungen.geldwerterVorteilProzent} onChange={(v) => setAnEinstellungen({...anEinstellungen, geldwerterVorteilProzent: v})} suffix="%" step={0.25} tooltip="Monatlicher Prozentsatz vom Listenpreis für geldwerten Vorteil: E-Auto 0,25% | Hybrid 0,5% | Verbrenner 1%" alignRight={true} />
             <InputField label="SV-Anteil Arbeitgeber" value={anEinstellungen.svAnteilAG} onChange={(v) => setAnEinstellungen({...anEinstellungen, svAnteilAG: v})} suffix="%" tooltip="Arbeitgeber-Anteil Sozialversicherung (Renten-, Kranken-, Pflege-, Arbeitslosenversicherung)" />
-            <InputField label="SV-Anteil Arbeitnehmer" value={anEinstellungen.svAnteilAN} onChange={(v) => setAnEinstellungen({...anEinstellungen, svAnteilAN: v})} suffix="%" tooltip="Arbeitnehmer-Anteil Sozialversicherung (Renten-, Kranken-, Pflege-, Arbeitslosenversicherung)" />
+            <InputField label="SV-Anteil Arbeitnehmer" value={anEinstellungen.svAnteilAN} onChange={(v) => setAnEinstellungen({...anEinstellungen, svAnteilAN: v})} suffix="%" tooltip="Arbeitnehmer-Anteil Sozialversicherung (Renten-, Kranken-, Pflege-, Arbeitslosenversicherung)" alignRight={true} />
             <InputField label="Privater Stromanteil" value={anEinstellungen.privatStromAnteil} onChange={(v) => setAnEinstellungen({...anEinstellungen, privatStromAnteil: v})} suffix="%" tooltip="Anteil des Stroms für private Fahrten, den der AN selbst bezahlt (ca. 30% wenn zu Hause geladen)" />
           </div>
           <div className="mt-3 p-3 bg-blue-50 rounded-lg text-sm space-y-1">
