@@ -91,7 +91,7 @@ export default function FuhrparkRechner() {
     geldwerterVorteilProzent: 0.25,
     arbeitstage: 220,
     stundenProTag: 8,
-    samstage: 0,
+    samstage: 20,
     samstagStunden: 5.5,
     samstagZuschlag: 50,
     ueberstundenZulage: 25,
