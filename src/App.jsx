@@ -203,10 +203,20 @@ export default function FuhrparkRechner() {
       <main className="max-w-4xl mx-auto py-6 px-4 space-y-4">
         
         <div className="bg-white rounded-xl shadow-lg p-4">
-          <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-            <Calculator className="w-5 h-5 text-blue-600" />
-            Ergebnis für {unternehmen.mitarbeiter} Mitarbeiter
-          </h2>
+          <div className="mb-3 flex items-center gap-3">
+            <Calculator className="w-5 h-5 text-blue-600 flex-shrink-0" />
+            <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2 flex-wrap">
+              Ergebnis für
+              <input
+                type="number"
+                value={unternehmen.mitarbeiter}
+                onChange={(e) => setUnternehmen({...unternehmen, mitarbeiter: parseFloat(e.target.value) || 1})}
+                min={1}
+                className="w-20 px-2 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center font-semibold"
+              />
+              Mitarbeiter
+            </h2>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
               <p className="text-xs text-gray-600">Gesamtkosten/Jahr</p>
