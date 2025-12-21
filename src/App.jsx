@@ -723,7 +723,7 @@ export default function FuhrparkRechner() {
                       <div>{berechnungen.balkenData.fw.extras.toLocaleString('de-DE')} €</div>
                     </div>
                     <div className="absolute right-full mr-2 bottom-0 hidden group-hover:block w-48 p-2 bg-gray-800 text-white text-xs rounded-lg shadow-lg" style={{ zIndex: 50 }}>
-                      Versicherung, Strom, Wartung - alles vom Arbeitgeber bezahlt, Mitarbeiter profitiert
+                      Versicherung, Strom, Wallbox, Ladekarten - alles vom Arbeitgeber bezahlt. Enthält auch Fixkosten-Ersparnisse (Fuhrparkmanager, Firmen-Wallboxen werden auf alle MA verteilt)
                     </div>
                   </div>
                   <div className="bg-yellow-400 flex items-center justify-center text-gray-800 text-xs font-bold relative group cursor-help" style={{ height: `${(berechnungen.balkenData.fw.steuer / berechnungen.balkenData.agAusgabe) * 100}%`, minHeight: '28px' }}>
