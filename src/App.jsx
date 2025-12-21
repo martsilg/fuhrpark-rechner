@@ -95,6 +95,7 @@ export default function FuhrparkRechner() {
     samstagStunden: 5.5,
     samstagZuschlag: 50,
     ueberstundenZulage: 25,
+    ueberstundenZulageFaehigeStunden: 454,
   });
 
   const berechnungen = useMemo(() => {
@@ -104,7 +105,7 @@ export default function FuhrparkRechner() {
     // Arbeitsstunden berechnen (mit Samstags-Zuschlag und Überstunden-Zulage)
     const normaleStunden = anEinstellungen.arbeitstage * anEinstellungen.stundenProTag;
     const samstagsStundenEffektiv = anEinstellungen.samstage * anEinstellungen.samstagStunden * (1 + anEinstellungen.samstagZuschlag / 100);
-    const ueberstundenEffektiv = (normaleStunden + (anEinstellungen.samstage * anEinstellungen.samstagStunden)) * (anEinstellungen.ueberstundenZulage / 100);
+    const ueberstundenEffektiv = anEinstellungen.ueberstundenZulageFaehigeStunden * (anEinstellungen.ueberstundenZulage / 100);
     const arbeitsstundenJahr = normaleStunden + samstagsStundenEffektiv + ueberstundenEffektiv;
     
     const leasingJahr = leasingBrutto * 12;
@@ -325,8 +326,9 @@ export default function FuhrparkRechner() {
             <InputField label="Samstage/Jahr" value={anEinstellungen.samstage} onChange={(v) => setAnEinstellungen({...anEinstellungen, samstage: v})} suffix="Tage" tooltip="Anzahl der zusätzlichen Samstagsarbeitstage pro Jahr" />
             <InputField label="Stunden/Samstag" value={anEinstellungen.samstagStunden} onChange={(v) => setAnEinstellungen({...anEinstellungen, samstagStunden: v})} suffix="h" step={0.5} tooltip="Arbeitsstunden pro Samstag (Standard: 5,5h)" alignRight={true} />
             <InputField label="Samstags-Zuschlag" value={anEinstellungen.samstagZuschlag} onChange={(v) => setAnEinstellungen({...anEinstellungen, samstagZuschlag: v})} suffix="%" tooltip="Prozentualer Zuschlag für Samstagsarbeit (üblich: 50%)" />
-            <InputField label="Überstunden-Zulage" value={anEinstellungen.ueberstundenZulage} onChange={(v) => setAnEinstellungen({...anEinstellungen, ueberstundenZulage: v})} suffix="%" tooltip="Prozentuale Zulage auf alle Arbeitsstunden (Standard: 25%)" alignRight={true} />
-            <InputField label="Steuersatz Mitarbeiter" value={anEinstellungen.steuersatzAN} onChange={(v) => setAnEinstellungen({...anEinstellungen, steuersatzAN: v})} suffix="%" tooltip="Persönlicher Steuersatz des Mitarbeiters (Lohnsteuer + Solidaritätszuschlag, typisch: 30-42%)" />
+            <InputField label="Überstunden-Zulage" value={anEinstellungen.ueberstundenZulage} onChange={(v) => setAnEinstellungen({...anEinstellungen, ueberstundenZulage: v})} suffix="%" tooltip="Prozentuale Zulage auf Überstunden-Zulage-fähige Stunden (Standard: 25%)" alignRight={true} />
+            <InputField label="Davon Überstd.-berechtigt" value={anEinstellungen.ueberstundenZulageFaehigeStunden} onChange={(v) => setAnEinstellungen({...anEinstellungen, ueberstundenZulageFaehigeStunden: v})} suffix="h" tooltip="Anzahl der Stunden pro Jahr, die für die Überstunden-Zulage berechtigt sind" />
+            <InputField label="Steuersatz Mitarbeiter" value={anEinstellungen.steuersatzAN} onChange={(v) => setAnEinstellungen({...anEinstellungen, steuersatzAN: v})} suffix="%" tooltip="Persönlicher Steuersatz des Mitarbeiters (Lohnsteuer + Solidaritätszuschlag, typisch: 30-42%)" alignRight={true} />
             <InputField label="Geldw. Vorteil Regel" value={anEinstellungen.geldwerterVorteilProzent} onChange={(v) => setAnEinstellungen({...anEinstellungen, geldwerterVorteilProzent: v})} suffix="%" step={0.25} tooltip="Monatlicher Prozentsatz vom Listenpreis für geldwerten Vorteil: E-Auto 0,25% | Hybrid 0,5% | Verbrenner 1%" alignRight={true} />
             <InputField label="SV-Anteil Arbeitgeber" value={anEinstellungen.svAnteilAG} onChange={(v) => setAnEinstellungen({...anEinstellungen, svAnteilAG: v})} suffix="%" tooltip="Arbeitgeber-Anteil Sozialversicherung (Renten-, Kranken-, Pflege-, Arbeitslosenversicherung)" />
             <InputField label="SV-Anteil Arbeitnehmer" value={anEinstellungen.svAnteilAN} onChange={(v) => setAnEinstellungen({...anEinstellungen, svAnteilAN: v})} suffix="%" tooltip="Arbeitnehmer-Anteil Sozialversicherung (Renten-, Kranken-, Pflege-, Arbeitslosenversicherung)" alignRight={true} />
@@ -341,7 +343,7 @@ export default function FuhrparkRechner() {
                     <br />• Samstage: {anEinstellungen.samstage} Tage × {anEinstellungen.samstagStunden}h × {100 + anEinstellungen.samstagZuschlag}% = {Math.round(anEinstellungen.samstage * anEinstellungen.samstagStunden * (1 + anEinstellungen.samstagZuschlag / 100)).toLocaleString('de-DE')} h
                   </>
                 )}
-                <br />• Überstunden-Zulage: {anEinstellungen.ueberstundenZulage}% auf {((anEinstellungen.arbeitstage * anEinstellungen.stundenProTag) + (anEinstellungen.samstage * anEinstellungen.samstagStunden)).toLocaleString('de-DE')} h = {Math.round(((anEinstellungen.arbeitstage * anEinstellungen.stundenProTag) + (anEinstellungen.samstage * anEinstellungen.samstagStunden)) * (anEinstellungen.ueberstundenZulage / 100)).toLocaleString('de-DE')} h
+                <br />• Überstunden-Zulage: {anEinstellungen.ueberstundenZulage}% auf {anEinstellungen.ueberstundenZulageFaehigeStunden.toLocaleString('de-DE')} h = {Math.round(anEinstellungen.ueberstundenZulageFaehigeStunden * (anEinstellungen.ueberstundenZulage / 100)).toLocaleString('de-DE')} h
               </span>
             </p>
             <p><strong>Geldwerter Vorteil:</strong> {berechnungen.geldwerterVorteil.toLocaleString('de-DE')} €/Jahr ({fahrzeug.bruttolistenpreis.toLocaleString('de-DE')} € × {anEinstellungen.geldwerterVorteilProzent}% × 12)</p>
