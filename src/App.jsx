@@ -258,19 +258,18 @@ export default function FuhrparkRechner() {
         personalkosten += Math.floor(ma / unternehmen.personalSchwelle) * unternehmen.zusatzPersonalKosten;
       }
       const werbeersparnis = ma * unternehmen.werbewertProFahrzeug;
-      const gesamtkostenOhneWerbung = (variableProMA * ma) + personalkosten + infraFirma;
-      const gesamtkosten = gesamtkostenOhneWerbung - werbeersparnis;
+      const gesamtkosten = (variableProMA * ma) + personalkosten + infraFirma;
       const kostenProMA = gesamtkosten / ma;
       const stundenlohn = kostenProMA / arbeitsstundenJahr;
-      const stundenlohnOhneWerbung = (gesamtkostenOhneWerbung / ma) / arbeitsstundenJahr;
+      const stundenlohnMitWerbung = stundenlohn - (werbeersparnis / ma / arbeitsstundenJahr);
       return {
         mitarbeiter: ma,
         gesamtkosten: Math.round(gesamtkosten),
         gesamtkostenEffektiv: Math.round(gesamtkosten * (1 - steuersatz)),
         kostenProMA: Math.round(kostenProMA),
-        stundenlohn: Math.round(stundenlohnOhneWerbung * 100) / 100,
+        stundenlohn: Math.round(stundenlohn * 100) / 100,
         stundenlohnEffektiv: Math.round(stundenlohn * (1 - steuersatz) * 100) / 100,
-        stundenlohnMitWerbung: Math.round(stundenlohn * 100) / 100,
+        stundenlohnMitWerbung: Math.round(stundenlohnMitWerbung * 100) / 100,
         werbeersparnis: Math.round(werbeersparnis),
       };
     };
@@ -334,6 +333,9 @@ export default function FuhrparkRechner() {
           <p className="font-bold">{d.mitarbeiter} Mitarbeiter</p>
           <p className="text-blue-600">Ausgabe: {d.stundenlohn.toFixed(2)} €/h</p>
           <p className="text-green-600 font-semibold">Effektiv: {d.stundenlohnEffektiv.toFixed(2)} €/h</p>
+          {unternehmen.werbewertProFahrzeug > 0 && (
+            <p className="text-red-600">Ausgabe inkl. Werbung: {d.stundenlohnMitWerbung.toFixed(2)} €/h</p>
+          )}
           <p className="text-gray-500 text-xs mt-1">Gesamt: {d.gesamtkosten.toLocaleString('de-DE')} €/Jahr</p>
         </div>
       );
@@ -638,7 +640,7 @@ export default function FuhrparkRechner() {
               <Tooltip content={<CustomTooltip />} />
               <Legend wrapperStyle={{ fontSize: '12px' }} />
               <Line type="monotone" dataKey="stundenlohn" stroke="#3b82f6" strokeWidth={2} name="Ausgabe exkl. Werbung" dot={false} />
-              <Line type="monotone" dataKey="stundenlohnEffektiv" stroke="#22c55e" strokeWidth={2} name="Effektiv" dot={false} />
+              <Line type="monotone" dataKey="stundenlohnEffektiv" stroke="#22c55e" strokeWidth={2} name="Effektiv (nach Steuern)" dot={false} />
               {unternehmen.werbewertProFahrzeug > 0 && (
                 <Line type="monotone" dataKey="stundenlohnMitWerbung" stroke="#ef4444" strokeWidth={2} name="Ausgabe inkl. Werbung" dot={false} strokeDasharray="5 5" />
               )}
