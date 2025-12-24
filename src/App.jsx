@@ -258,15 +258,17 @@ export default function FuhrparkRechner() {
         personalkosten += Math.floor(ma / unternehmen.personalSchwelle) * unternehmen.zusatzPersonalKosten;
       }
       const werbeersparnis = ma * unternehmen.werbewertProFahrzeug;
-      const gesamtkosten = (variableProMA * ma) + personalkosten + infraFirma - werbeersparnis;
+      const gesamtkostenOhneWerbung = (variableProMA * ma) + personalkosten + infraFirma;
+      const gesamtkosten = gesamtkostenOhneWerbung - werbeersparnis;
       const kostenProMA = gesamtkosten / ma;
       const stundenlohn = kostenProMA / arbeitsstundenJahr;
+      const stundenlohnOhneWerbung = (gesamtkostenOhneWerbung / ma) / arbeitsstundenJahr;
       return {
         mitarbeiter: ma,
         gesamtkosten: Math.round(gesamtkosten),
         gesamtkostenEffektiv: Math.round(gesamtkosten * (1 - steuersatz)),
         kostenProMA: Math.round(kostenProMA),
-        stundenlohn: Math.round(stundenlohn * 100) / 100,
+        stundenlohn: Math.round(stundenlohnOhneWerbung * 100) / 100,
         stundenlohnEffektiv: Math.round(stundenlohn * (1 - steuersatz) * 100) / 100,
         stundenlohnMitWerbung: Math.round(stundenlohn * 100) / 100,
         werbeersparnis: Math.round(werbeersparnis),
@@ -635,10 +637,10 @@ export default function FuhrparkRechner() {
               <YAxis tickFormatter={(v) => `${v.toFixed(1)}€`} tick={{ fontSize: 11 }} />
               <Tooltip content={<CustomTooltip />} />
               <Legend wrapperStyle={{ fontSize: '12px' }} />
-              <Line type="monotone" dataKey="stundenlohn" stroke="#3b82f6" strokeWidth={2} name="Brutto" dot={false} />
+              <Line type="monotone" dataKey="stundenlohn" stroke="#3b82f6" strokeWidth={2} name="Ausgabe exkl. Werbung" dot={false} />
               <Line type="monotone" dataKey="stundenlohnEffektiv" stroke="#22c55e" strokeWidth={2} name="Effektiv" dot={false} />
               {unternehmen.werbewertProFahrzeug > 0 && (
-                <Line type="monotone" dataKey="stundenlohnMitWerbung" stroke="#ef4444" strokeWidth={2} name="Mit Werbewert" dot={false} strokeDasharray="5 5" />
+                <Line type="monotone" dataKey="stundenlohnMitWerbung" stroke="#ef4444" strokeWidth={2} name="Ausgabe inkl. Werbung" dot={false} strokeDasharray="5 5" />
               )}
             </LineChart>
           </ResponsiveContainer>
