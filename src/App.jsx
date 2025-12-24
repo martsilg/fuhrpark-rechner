@@ -72,6 +72,7 @@ export default function FuhrparkRechner() {
       personalSchwelle: 100,
       zusatzPersonalKosten: 40000,
       grenzsteuersatz: 45,
+      werbewertProFahrzeug: 0,
     },
     verbrenner: {
       leasingMonat: 350,
@@ -256,7 +257,8 @@ export default function FuhrparkRechner() {
       if (ma >= unternehmen.personalSchwelle) {
         personalkosten += Math.floor(ma / unternehmen.personalSchwelle) * unternehmen.zusatzPersonalKosten;
       }
-      const gesamtkosten = (variableProMA * ma) + personalkosten + infraFirma;
+      const werbeersparnis = ma * unternehmen.werbewertProFahrzeug;
+      const gesamtkosten = (variableProMA * ma) + personalkosten + infraFirma - werbeersparnis;
       const kostenProMA = gesamtkosten / ma;
       const stundenlohn = kostenProMA / arbeitsstundenJahr;
       return {
@@ -266,6 +268,8 @@ export default function FuhrparkRechner() {
         kostenProMA: Math.round(kostenProMA),
         stundenlohn: Math.round(stundenlohn * 100) / 100,
         stundenlohnEffektiv: Math.round(stundenlohn * (1 - steuersatz) * 100) / 100,
+        stundenlohnMitWerbung: Math.round(stundenlohn * 100) / 100,
+        werbeersparnis: Math.round(werbeersparnis),
       };
     };
     
@@ -477,6 +481,11 @@ export default function FuhrparkRechner() {
             <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
               <p className="text-xs text-gray-600">Gesamtkosten/Jahr (alle MA)</p>
               <p className="text-xl font-bold text-blue-700">{berechnungen.aktuell.gesamtkosten.toLocaleString('de-DE')} €</p>
+              {unternehmen.werbewertProFahrzeug > 0 && (
+                <p className="text-xs text-green-600 mt-1">
+                  (inkl. -{berechnungen.aktuell.werbeersparnis.toLocaleString('de-DE')} € Werbewert)
+                </p>
+              )}
             </div>
             <div className="bg-green-50 rounded-lg p-3 border border-green-200">
               <p className="text-xs text-gray-600">Tatsächliche Belastung nach Steuern (alle MA)</p>
@@ -536,6 +545,7 @@ export default function FuhrparkRechner() {
             <InputField label="Fuhrpark-Gehalt" value={unternehmen.fuhrparkGehalt} onChange={(v) => setUnternehmen({...unternehmen, fuhrparkGehalt: v})} suffix="€/Jahr" tooltip="Jahresgehalt Fuhrparkmanager inkl. AG-Anteile" />
             <InputField label="Personal-Schwelle" value={unternehmen.personalSchwelle} onChange={(v) => setUnternehmen({...unternehmen, personalSchwelle: v})} suffix="MA" tooltip="Ab dieser Anzahl an Firmenfahrzeugen wird zusätzliches Personal für die Fuhrparkverwaltung benötigt" alignRight={true} />
             <InputField label="Zusatzpersonal-Kosten" value={unternehmen.zusatzPersonalKosten} onChange={(v) => setUnternehmen({...unternehmen, zusatzPersonalKosten: v})} suffix="€/Jahr" tooltip="Jahreskosten pro zusätzlicher Teilzeitkraft für die Fuhrparkverwaltung" />
+            <InputField label="Werbewert/Fahrzeug" value={unternehmen.werbewertProFahrzeug} onChange={(v) => setUnternehmen({...unternehmen, werbewertProFahrzeug: v})} suffix="€/Jahr" tooltip="Jährlicher Wert der Werbung durch Fahrzeugbeschriftung pro Fahrzeug. Senkt die effektiven Kosten des Arbeitgebers." alignRight={true} />
           </div>
         </CollapsibleSection>
 
@@ -627,6 +637,9 @@ export default function FuhrparkRechner() {
               <Legend wrapperStyle={{ fontSize: '12px' }} />
               <Line type="monotone" dataKey="stundenlohn" stroke="#3b82f6" strokeWidth={2} name="Brutto" dot={false} />
               <Line type="monotone" dataKey="stundenlohnEffektiv" stroke="#22c55e" strokeWidth={2} name="Effektiv" dot={false} />
+              {unternehmen.werbewertProFahrzeug > 0 && (
+                <Line type="monotone" dataKey="stundenlohnMitWerbung" stroke="#ef4444" strokeWidth={2} name="Mit Werbewert" dot={false} strokeDasharray="5 5" />
+              )}
             </LineChart>
           </ResponsiveContainer>
         </div>
